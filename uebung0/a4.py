@@ -3,6 +3,7 @@ import pytest
 from functools import lru_cache
 import numpy as np
 import matplotlib.pyplot as plt
+import sympy as sp
 
 
 # a)--------------------------------------------------------------------------------------------------------------------
@@ -69,21 +70,31 @@ time_lucas_numbers = []
 for n in range(size):
     start = time.time()
     lucas_number(n)
-    time_lucas_numbers.append(time.time()-start)
+    time_lucas_numbers.append(time.time() - start)
 
 time_cached_lucas_numbers = []
 for n in range(size):
     start = time.time()
     cached_lucas_number(n)
-    time_cached_lucas_numbers.append(time.time()-start)
+    time_cached_lucas_numbers.append(time.time() - start)
 
 fig, axs = plt.subplots(1, 2, tight_layout=True)
 axs[0].plot(values_input, np.array(time_lucas_numbers))
 axs[0].set_xlabel(r"lucas_number(n)")
 axs[0].set_ylabel(r"$\Delta t$ [s]")
 
-axs[1].plot(values_input, np.array(time_cached_lucas_numbers)*1e6, color='crimson')
+axs[1].plot(values_input, np.array(time_cached_lucas_numbers) * 1e6, color='crimson')
 axs[1].set_xlabel(r"cached_lucas_number(n)")
 axs[1].set_ylabel(r"$\Delta t$ $10^{-6}$ s")
 
 plt.show()
+
+
+# c)-------------------------------------------------------------------------------------------------
+def hermite(n):
+    z = sp.Symbol('z')
+    if n <= 0:
+        return 1
+    elif n == 1:
+        return 2 * z
+    return 2 * z * hermite(n - 1) - 2 * n * hermite(n - 2)
