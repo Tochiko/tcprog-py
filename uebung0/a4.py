@@ -1,13 +1,18 @@
+import time
 import pytest
 from functools import lru_cache
+import numpy as np
+import matplotlib.pyplot as plt
 
 
+# a)--------------------------------------------------------------------------------------------------------------------
 def lucas_number(n):
     if n <= 0:
         return 2
     elif n == 1:
         return 1
     return lucas_number(n - 1) + lucas_number(n - 2)
+
 
 """
 Unter einem Cache x wird ein Zwischenspeicher für sich wiederholende Verarbeitungen des Types x verstanden. In der Regel werden die 
@@ -29,13 +34,16 @@ eineindeutig eine Ressource, die zwischengespeichert wird. Bei einem Reload der 
 läufig neu geladen, sondern nur dann, wenn der Cache abgelaufen ist - Falls gecached wird. Nicht alle Ressourcen lassen
 sich sinnvoll cachen.
 """
-@lru_cache(maxsize=32)
+
+
+@lru_cache(maxsize=4)
 def cached_lucas_number(n):
     if n <= 0:
         return 2
     elif n == 1:
         return 1
-    return lucas_number(n - 1) + lucas_number(n - 2)
+    return cached_lucas_number(n - 1) + cached_lucas_number(n - 2)
+
 
 @pytest.mark.parametrize('n, expected',
                          [(0, 2), (1, 1), (2, 3), (3, 4), (4, 7)])
@@ -44,9 +52,38 @@ def test_lucas_number(n, expected):
     assert lucas_num == expected
     assert type(lucas_num) is int
 
+
 @pytest.mark.parametrize('n, expected',
                          [(0, 2), (1, 1), (2, 3), (3, 4), (4, 7)])
 def test_cached_lucas_number(n, expected):
     lucas_num = cached_lucas_number(n)
     assert lucas_num == expected
     assert type(lucas_num) is int
+
+
+# b)--------------------------------------------------------------------------------------------------------------------
+
+size = 32
+values_input = np.arange(0, size, 1, dtype=int)
+time_lucas_numbers = []
+for n in range(size):
+    start = time.time()
+    lucas_number(n)
+    time_lucas_numbers.append(time.time()-start)
+
+time_cached_lucas_numbers = []
+for n in range(size):
+    start = time.time()
+    cached_lucas_number(n)
+    time_cached_lucas_numbers.append(time.time()-start)
+
+fig, axs = plt.subplots(1, 2, tight_layout=True)
+axs[0].plot(values_input, np.array(time_lucas_numbers))
+axs[0].set_xlabel(r"lucas_number(n)")
+axs[0].set_ylabel(r"$\Delta t$ [s]")
+
+axs[1].plot(values_input, np.array(time_cached_lucas_numbers)*1e6, color='crimson')
+axs[1].set_xlabel(r"cached_lucas_number(n)")
+axs[1].set_ylabel(r"$\Delta t$ $10^{-6}$ s")
+
+plt.show()
