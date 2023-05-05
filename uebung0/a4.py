@@ -94,7 +94,14 @@ plt.show()
 def hermite(n):
     z = sp.Symbol('z')
     if n <= 0:
-        return 1
+        return sp.sympify(1)
     elif n == 1:
-        return 2 * z
-    return 2 * z * hermite(n - 1) - 2 * n * hermite(n - 2)
+        return sp.sympify(2) * z
+    return sp.sympify(2) * z * hermite(n - 1) - sp.sympify(2) * n * hermite(n - 2)
+
+
+@pytest.mark.parametrize('n, z, expected',
+                         [(0, 0, 1), (1, 1, 2), (2, 1, 0), (3, 1, -12), (3, 2, 24), (3, 3, 156)])
+def test_hermite(n, z, expected):
+    f = sp.lambdify(sp.Symbol('z'), hermite(n))
+    assert f(z) == expected
