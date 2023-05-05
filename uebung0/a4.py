@@ -105,3 +105,4 @@ def hermite(n):
 def test_hermite(n, z, expected):
     f = sp.lambdify(sp.Symbol('z'), hermite(n))
     assert f(z) == expected
+# H(n=3)(z) = 8z**3 - 20z
