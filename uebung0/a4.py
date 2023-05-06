@@ -13,7 +13,15 @@ def lucas_number(n):
     elif n == 1:
         return 1
     return lucas_number(n - 1) + lucas_number(n - 2)
-
+# Ju: verstehe den Aufbau der Funktion nicht. Ich hätte das so gemacht:
+    # if n <= 0:
+    #     return 2
+    # elif n == 1:
+    #     return 1
+    # eliif n > 1:
+    #   return cached_lucas_number(n - 1) + cached_lucas_number(n - 2)
+# Warum ist mein Aufbau evtl. nicht möglich oder was macht ihn weniger schön 
+# oder effizient als den hier?
 
 """
 Unter einem Cache x wird ein Zwischenspeicher für sich wiederholende Verarbeitungen des Types x verstanden. In der Regel werden die 
@@ -80,12 +88,14 @@ for n in range(size):
 
 fig, axs = plt.subplots(1, 2, tight_layout=True)
 axs[0].plot(values_input, np.array(time_lucas_numbers))
-axs[0].set_xlabel(r"lucas_number(n)")
+# axs[0].set_xlabel(r"lucas_number(n)")
+axs[0].set_xlabel(r"n") # Ju: Vorschlag zur Achsenbeschriftung, weil eig
+# ist auf der x-Achse nicht die Lucasnummer sondern nur das n aufgetragen
 axs[0].set_ylabel(r"$\Delta t$ [s]")
 
 axs[1].plot(values_input, np.array(time_cached_lucas_numbers) * 1e6, color='crimson')
-axs[1].set_xlabel(r"cached_lucas_number(n)")
-axs[1].set_ylabel(r"$\Delta t$ $10^{-6}$ s")
+axs[1].set_xlabel(r"n (cached)")
+axs[1].set_ylabel(r"$\Delta t$ [$10^{-6}$ s]")
 
 plt.show()
 
