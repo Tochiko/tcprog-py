@@ -8,7 +8,7 @@ def naive_div(a, b):
     elif b < 0:
         raise NotImplementedError('division by negative numbers is not implemented')
     elif a == 0:
-        return a, b
+       return 0, 0
     r = -1
     while a >= 0:
         a -= b
@@ -17,7 +17,7 @@ def naive_div(a, b):
 
 
 @pytest.mark.parametrize('a, b, expected',
-                         [(1, 1, (1, 0)), (3, 2, (1, 1)), (0, 1, (0, 1))])
+                         [(1, 1, (1, 0)), (3, 2, (1, 1)), (0, 1, (0, 0))])
 def test_nativ_dif(a, b, expected):
     assert naive_div(a, b) == expected
     with pytest.raises(ZeroDivisionError):
@@ -33,7 +33,7 @@ def div(a, b):
     elif b < 0:
         raise NotImplementedError('division by negative numbers is not implemented')
     elif a == 0:
-        return a, b
+        return 0, 0
     n = a.bit_length()
     tmp = b << n
     r = 0
@@ -46,7 +46,7 @@ def div(a, b):
     return r, a
 
 @pytest.mark.parametrize('a, b, expected',
-                         [(1, 1, (1, 0)), (3, 2, (1, 1)), (0, 1, (0, 1))])
+                         [(1, 1, (1, 0)), (3, 2, (1, 1)), (0, 1, (0, 0))])
 def test_div(a, b, expected):
     assert div(a,b) == expected
     with pytest.raises(ZeroDivisionError):
