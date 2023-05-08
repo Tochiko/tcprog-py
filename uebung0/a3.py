@@ -44,11 +44,6 @@ def expectationValue(A, potenz, psi):
     """
     return sp.integrate(sp.conjugate(psi) * A(psi, potenz), (x, -sp.oo, sp.oo))
 
-# Ju: Ich versteh noch nicht ganz, was das A(psi, potenz) ist.
-# Kann mir das wer in "normaler" mathematischer Notation aufschreiben? :)
-
-# Ju: Aus der Aufschrift würde mir ohne das Wissen, dass psi von x abhängig ist,
-# nicht ersichtlich werden, warum nach x integriert wird.
 
 def variance(A, psi):
     """Calculates the variance var_{A,psi}
@@ -105,10 +100,6 @@ def applied_pOperator_realSpace(psi_x, potenz):
         the momentum applied on psi: \hat{p}^n \Psi(x)
     """
     return (-sp.I)**potenz * sp.diff(psi_x, x, potenz)
-# Ju: So wie ich sp.diff verstanden habe, bedeutet sp.diff(psi, x, potenz), dass
-# man erst nach x und dann nach der Potenz ableitet. Das würde bedeuten, 
-# 'potenz' wäre eine Differentationsvariable, aber in dem Operator leitet man
-# ja nur nach x ab.
 
 
 def applied_xOperator_realSpace(psi_x, potenz):
@@ -129,13 +120,6 @@ def applied_xOperator_realSpace(psi_x, potenz):
     """
     return x**potenz * psi_x
 
-# Ju: Finde die Bezeichnung etwas irreführend, ich hätte jetzt erwartet, dass die
-# Funktion so
-#   return x
-# aussieht. So ist das für mich schon der auf psi angewendete Operator.
-
-# Ju: Warum braucht man bei der Funktion die Potenz? So wie ich das sehe,
-# nutzt man das nie oder bin ich einfach blind?
 
 def hermite_direct(n):
     """Gives the nth hermite polynome (direct implementation)
