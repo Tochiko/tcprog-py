@@ -17,7 +17,7 @@ def naive_div(a, b):
 
 
 @pytest.mark.parametrize('a, b, expected',
-                         [(1, 1, (1, 0)), (3, 2, (1, 1)), (0, 1, (0, 0))])
+                         [(1, 1, (1, 0)), (3, 2, (1, 1)), (0, 1, (0, 0)), (32, 5, (6, 2))])
 def test_nativ_dif(a, b, expected):
     assert naive_div(a, b) == expected
     with pytest.raises(ZeroDivisionError):
@@ -46,7 +46,7 @@ def div(a, b):
     return r, a
 
 @pytest.mark.parametrize('a, b, expected',
-                         [(1, 1, (1, 0)), (3, 2, (1, 1)), (0, 1, (0, 0))])
+                         [(1, 1, (1, 0)), (3, 2, (1, 1)), (0, 1, (0, 0)),(32, 5, (6, 2))])
 def test_div(a, b, expected):
     assert div(a,b) == expected
     with pytest.raises(ZeroDivisionError):
