@@ -10,6 +10,8 @@ import matplotlib.pyplot as plt
 from matplotlib import cm
 from scipy.special import sph_harm
 #from sympy.functions.special.spherical_harmonics import Ynm
+#bitte die obrige sympy function nehmen und nichts von scipy!!!
+
 
 #parameters
 l, m = 3,1
