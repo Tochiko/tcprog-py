@@ -13,15 +13,6 @@ def lucas_number(n):
     elif n == 1:
         return 1
     return lucas_number(n - 1) + lucas_number(n - 2)
-# Ju: verstehe den Aufbau der Funktion nicht. Ich hätte das so gemacht:
-    # if n <= 0:
-    #     return 2
-    # elif n == 1:
-    #     return 1
-    # eliif n > 1:
-    #   return cached_lucas_number(n - 1) + cached_lucas_number(n - 2)
-# Warum ist mein Aufbau evtl. nicht möglich oder was macht ihn weniger schön 
-# oder effizient als den hier?
 
 """
 Unter einem Cache x wird ein Zwischenspeicher für sich wiederholende Verarbeitungen des Types x verstanden. In der Regel werden die 
@@ -76,21 +67,20 @@ size = 32
 values_input = np.arange(0, size, 1, dtype=int)
 time_lucas_numbers = []
 for n in range(size):
-    start = time.time()
+    start = time.perf_counter()
     lucas_number(n)
-    time_lucas_numbers.append(time.time() - start)
+    time_lucas_numbers.append(time.perf_counter() - start)
 
 time_cached_lucas_numbers = []
 for n in range(size):
-    start = time.time()
+    start = time.perf_counter()
     cached_lucas_number(n)
-    time_cached_lucas_numbers.append(time.time() - start)
+    time_cached_lucas_numbers.append(time.perf_counter() - start)
 
 fig, axs = plt.subplots(1, 2, tight_layout=True)
+fig.suptitle(r"Computation time lucas number $L_n$")
 axs[0].plot(values_input, np.array(time_lucas_numbers))
-# axs[0].set_xlabel(r"lucas_number(n)")
-axs[0].set_xlabel(r"n") # Ju: Vorschlag zur Achsenbeschriftung, weil eig
-# ist auf der x-Achse nicht die Lucasnummer sondern nur das n aufgetragen
+axs[0].set_xlabel(r"n")
 axs[0].set_ylabel(r"$\Delta t$ [s]")
 
 axs[1].plot(values_input, np.array(time_cached_lucas_numbers) * 1e6, color='crimson')
@@ -101,6 +91,7 @@ plt.show()
 
 
 # c)-------------------------------------------------------------------------------------------------
+@lru_cache(maxsize=4)
 def hermite(n):
     z = sp.Symbol('z')
     if n <= 0:
