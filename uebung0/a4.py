@@ -5,15 +5,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import sympy as sp
 
-
 # a)--------------------------------------------------------------------------------------------------------------------
-def lucas_number(n):
-    if n <= 0:
-        return 2
-    elif n == 1:
-        return 1
-    return lucas_number(n - 1) + lucas_number(n - 2)
-
 """
 Unter einem Cache x wird ein Zwischenspeicher für sich wiederholende Verarbeitungen des Types x verstanden. In der Regel werden die 
 Ergebnisse der Verarbeitungen des Types x in der Form Key-Value bzw. Input-Output im Arbeitsspeicher zwischengespeichert. 
@@ -36,9 +28,43 @@ sich sinnvoll cachen.
 """
 
 
+def lucas_number(n):
+    """Returns the lucas number for a positive integer in a recursive way
+
+    Parameters
+    ----------
+    n : int, required
+
+    Raises
+    ------
+    ValueError
+        If a negative integer is given
+    """
+    if n < 0:
+        raise ValueError('only positive integers are allowed')
+    if n == 0:
+        return 2
+    elif n == 1:
+        return 1
+    return lucas_number(n - 1) + lucas_number(n - 2)
+
+
 @lru_cache(maxsize=4)
 def cached_lucas_number(n):
-    if n <= 0:
+    """Returns the lucas number for a positive integer in a recursive way with cached function results
+
+    Parameters
+    ----------
+    n : int, required
+
+    Raises
+    ------
+    ValueError
+        If a negative integer is given
+    """
+    if n < 0:
+        raise ValueError('only positive integers are allowed')
+    if n == 0:
         return 2
     elif n == 1:
         return 1
@@ -50,7 +76,8 @@ def cached_lucas_number(n):
 def test_lucas_number(n, expected):
     lucas_num = lucas_number(n)
     assert lucas_num == expected
-    assert type(lucas_num) is int
+    with pytest.raises(ValueError):
+        lucas_number(-1)
 
 
 @pytest.mark.parametrize('n, expected',
@@ -58,7 +85,8 @@ def test_lucas_number(n, expected):
 def test_cached_lucas_number(n, expected):
     lucas_num = cached_lucas_number(n)
     assert lucas_num == expected
-    assert type(lucas_num) is int
+    with pytest.raises(ValueError):
+        cached_lucas_number(-1)
 
 
 # b)--------------------------------------------------------------------------------------------------------------------
@@ -93,8 +121,23 @@ plt.show()
 # c)-------------------------------------------------------------------------------------------------
 @lru_cache(maxsize=4)
 def hermite(n):
+    """
+    Returns the hermite polynom for a positive integer by a recursive way with cached function results
+    as a symbolic expression by sympy
+
+    Parameters
+    ----------
+    n : int, required
+
+    Raises
+    ------
+    ValueError
+        If a negative integer is given
+    """
     z = sp.Symbol('z')
-    if n <= 0:
+    if n < 0:
+        raise ValueError('only positive integers are allowed')
+    if n == 0:
         return sp.sympify(1)
     elif n == 1:
         return sp.sympify(2) * z
@@ -106,4 +149,6 @@ def hermite(n):
 def test_hermite(n, z, expected):
     f = sp.lambdify(sp.Symbol('z'), hermite(n))
     assert f(z) == expected
+    with pytest.raises(ValueError):
+        hermite(-1)
 # H(n=3)(z) = 8z**3 - 20z
