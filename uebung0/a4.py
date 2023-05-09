@@ -67,17 +67,18 @@ size = 32
 values_input = np.arange(0, size, 1, dtype=int)
 time_lucas_numbers = []
 for n in range(size):
-    start = time.time()
+    start = time.perf_counter()
     lucas_number(n)
-    time_lucas_numbers.append(time.time() - start)
+    time_lucas_numbers.append(time.perf_counter() - start)
 
 time_cached_lucas_numbers = []
 for n in range(size):
-    start = time.time()
+    start = time.perf_counter()
     cached_lucas_number(n)
-    time_cached_lucas_numbers.append(time.time() - start)
+    time_cached_lucas_numbers.append(time.perf_counter() - start)
 
 fig, axs = plt.subplots(1, 2, tight_layout=True)
+fig.suptitle(r"Computation time lucas number $L_n$")
 axs[0].plot(values_input, np.array(time_lucas_numbers))
 axs[0].set_xlabel(r"n")
 axs[0].set_ylabel(r"$\Delta t$ [s]")
