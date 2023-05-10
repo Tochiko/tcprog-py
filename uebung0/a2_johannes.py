@@ -4,32 +4,37 @@ Created on Sat May  6 18:38:48 2023
 
 @author: Julia
 """
-
+import sympy as sp
+from sympy.functions.special.spherical_harmonics import Ynm
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import cm
-from scipy.special import sph_harm
-#from sympy.functions.special.spherical_harmonics import Ynm
-#bitte die obrige sympy function nehmen und nichts von scipy!!!
-
 
 #parameters
-l, m = 3,1
 N = 100
-thetas = np.linspace(0, np.pi, N)
-phis = np.linspace(0, 2.0 * np.pi, N)
+l_qn = 3
+m_qn = 1
 
-#calculation
-theta_grid, phi_grid = np.meshgrid(thetas, phis)
-Ylm = sph_harm(m, l, phi_grid, theta_grid)
-Ylm_num = 1/2 * np.abs(Ylm + np.conjugate(Ylm))
+l = sp.Symbol('l', integer=True, nonnegative=True)
+m = sp.Symbol('m', integer=True)
+theta = sp.Symbol('theta', real=True)
+phi = sp.Symbol('phi',real=True)
 
-x = Ylm_num*np.cos(phi_grid) * np.sin(theta_grid)
-y = Ylm_num*np.sin(phi_grid) * np.sin(theta_grid)
-z = Ylm_num*np.cos(theta_grid)
+theta_values = np.linspace(0, np.pi, N)
+phi_values = np.linspace(0,np.pi*2, N)
+theta_grid, phi_grid = np.meshgrid(theta_values,phi_values)
+
+Ylm_sym = Ynm(l,m,theta, phi).expand(func=True)
+Ylm_num = sp.lambdify((l,m,theta, phi), Ylm_sym)
+
+Ylm_values = 0.5*np.abs(np.conjugate(Ylm_num(l_qn,m_qn,theta_grid,phi_grid))+Ylm_num(l_qn,m_qn,theta_grid,phi_grid))
+
+x = Ylm_values*np.cos(phi_grid) * np.sin(theta_grid)
+y = Ylm_values*np.sin(phi_grid) * np.sin(theta_grid)
+z = Ylm_values*np.cos(theta_grid)
 
 # normalize color to [0,1] corresponding to phase of spherical harmonic
-colors = (np.angle(Ylm)+np.pi)/(2*np.pi)
+colors = (np.angle(Ylm_num(l_qn,m_qn,theta_grid,phi_grid))+np.pi)/(2*np.pi)
 
 #plot
 fig = plt.figure(figsize=(5, 5))
