@@ -1,0 +1,155 @@
+{
+    "molssi_bse_schema": {
+        "schema_type": "complete",
+        "schema_version": "0.1"
+    },
+    "revision_description": "Custom Basis Set (H, C, N, O)",
+    "revision_date": "2023-05-18",
+    "elements": {
+        "1": {
+            "electron_shells": [
+                {
+                    "function_type": "gto",
+                    "region": "",
+                    "angular_momentum": [0],
+                    "exponents": [
+                        5.867945346471337,
+                        1.0688535699099497,
+                        0.28927348885244164
+                    ],
+                    "coefficients": [
+                        [
+                            0.1543289673,
+                            0.5353281423,
+                            0.4446345422
+                        ]
+                    ]
+                }
+            ]
+        },
+        "6": {
+            "electron_shells": [
+                {
+                    "function_type": "gto",
+                    "region": "",
+                    "angular_momentum": [0],
+                    "exponents": [
+                        14.270116586982525,
+                        0.8665299572440427,
+                        0.33267362032148295
+                    ],
+                    "coefficients": [
+                        [
+                            -0.0594474934,
+                            0.5960385398,
+                            0.458178629
+                        ]
+                    ]
+                },
+                {
+                    "function_type": "gto",
+                    "region": "",
+                    "angular_momentum": [1],
+                    "exponents": [
+                        2.91251336299368,
+                        0.8212318633052,
+                        0.190414685256264
+                    ],
+                    "coefficients": [
+                        [
+                            0.1623948553,
+                            0.5661708862,
+                            0.4223071752
+                        ]
+                    ]
+                }
+            ]
+        },
+        "7": {
+            "electron_shells": [
+                {
+                    "function_type": "gto",
+                    "region": "",
+                    "angular_momentum": [0],
+                    "exponents": [
+                        16.95301561223695,
+                        1.0294447003348273,
+                        0.3952189910091023
+                    ],
+                    "coefficients": [
+                        [
+                            -0.0594474934,
+                            0.5960385398,
+                            0.458178629
+                        ]
+                    ]
+                },
+                {
+                    "function_type": "gto",
+                    "region": "",
+                    "angular_momentum": [1],
+                    "exponents": [
+                        4.102242760564406,
+                        1.1566959687785936,
+                        0.2681969717367281
+                    ],
+                    "coefficients": [
+                        [
+                            0.1623948553,
+                            0.5661708862,
+                            0.4223071752
+                        ]
+                    ]
+                }
+            ]
+        },
+        "8": {
+            "electron_shells": [
+                {
+                    "function_type": "gto",
+                    "region": "",
+                    "angular_momentum": [0],
+                    "exponents": [
+                        32.9462113219899,
+                        2.0006058755147063,
+                        0.7680620778081968
+                    ],
+                    "coefficients": [
+                        [
+                            -0.0594474934,
+                            0.5960385398,
+                            0.458178629
+                        ]
+                    ]
+                },
+                {
+                    "function_type": "gto",
+                    "region": "",
+                    "angular_momentum": [1],
+                    "exponents": [
+                        4.669788476519471,
+                        1.3167249773135405,
+                        0.3053020508911269
+                    ],
+                    "coefficients": [
+                        [
+                            0.1623948553,
+                            0.5661708862,
+                            0.4223071752
+                        ]
+                    ]
+                }
+            ]
+        }
+    },
+    "version": "1",
+    "function_types": ["gto"],
+    "names": ["Custom Basis Set"],
+    "tags": [],
+    "family": "custom",
+    "description": "VSTO-3G type basis for H, C, N, O, using small Gaussian expansion by R. F. Stewart and optimised STO exponents by S. L. Dixon and P. C. Jursy.",
+    "role": "orbital",
+    "auxiliaries": {},
+    "name": "VSTO-3G"
+}
+
