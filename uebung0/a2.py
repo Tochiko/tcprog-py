@@ -7,8 +7,8 @@ from matplotlib import cm
 
 #parameters
 N = 100
-l_qn = 3
-m_qn = 1
+l_qn = 2
+m_qn = 2
 
 l = sp.Symbol('l', integer=True, nonnegative=True)
 m = sp.Symbol('m', integer=True)
@@ -22,7 +22,7 @@ theta_grid, phi_grid = np.meshgrid(theta_values,phi_values)
 Ylm_sym = Ynm(l,m,theta, phi).expand(func=True)
 Ylm_num = sp.lambdify((l,m,theta, phi), Ylm_sym)
 
-Ylm_values = 0.5*np.abs(np.conjugate(Ylm_num(l_qn,m_qn,theta_grid,phi_grid))+Ylm_num(l_qn,m_qn,theta_grid,phi_grid))
+Ylm_values = np.abs(Ylm_num(l_qn,m_qn,theta_grid,phi_grid))
 
 x = Ylm_values*np.cos(phi_grid) * np.sin(theta_grid)
 y = Ylm_values*np.sin(phi_grid) * np.sin(theta_grid)
