@@ -1,23 +1,24 @@
 import numpy as np
 from atomic_data import ATOMIC_NUMBER
 
+
 class Atom:
     """
     A class representing an atom with a specific symbol and coordinate.
 
     Attributes:
-        atomic_number (dict): A dictionary with keys corresponding to 
+        atomic_number (dict): A dictionary with keys corresponding to
             atomic symbols and values corresponding to atomic numbers.
         symbol (str): The atomic symbol of the atom.
         coord (list[float]): The coordinate of the atom.
         atnum (int): The atomic number corresponding to the symbol of the atom.
 
     Methods:
-        __init__(self, symbol: str, coord: list[float]) -> None: 
+        __init__(self, symbol: str, coord: list[float]) -> None:
             Initializes a new atom with the given symbol and coordinate.
     """
 
-    def __init__(self, symbol: str, coord: list[float], unit='B') -> None:
+    def __init__(self, symbol: str, coord: list[float], unit='A') -> None:
         """
         Initializes a new `atom` object.
 

@@ -6,28 +6,51 @@ from basis_set import BasisSet
 a0 = 0.529177210903  # Bohr radius in angstrom
 
 
+def from_xyz(filename: str) -> 'Molecule':
+    """
+    Reads the coordinates of the atoms in the molecule from an XYZ file.
+
+    Parameters:
+        filename (str): The name of the XYZ file to read.
+
+    Returns:
+        Molecule
+    """
+    molecule = Molecule()
+    with open(filename) as f:
+        for line in f:
+            tmp = line.split()
+            if len(tmp) == 4:
+                symbol = tmp[0]
+                coord = np.array([float(x) for x in tmp[1:]]) / a0
+                at = Atom(symbol, coord)
+                molecule.atomlist.append(at)
+    molecule.natom = len(molecule.atomlist)
+    return molecule
+
+
 class Molecule:
     """
     A class representing a molecule.
 
     Attributes:
-        atomlist (list): A list of `atom` objects representing the atoms 
+        atomlist (list): A list of `atom` objects representing the atoms
             in the molecule.
         natom (int): The number of atoms in the molecule.
-        basisfunctions (list): A list of `Gaussian` objects representing 
+        basisfunctions (list): A list of `Gaussian` objects representing
             the basis functions of the molecule.
-        S (ndarray): A matrix representing the overlap integrals between 
+        S (ndarray): A matrix representing the overlap integrals between
             basis functions.
 
     Methods:
         __init__(self) -> None: Initializes a new `molecule` object.
-        set_atomlist(self,a: list) -> None: Sets the `atomlist` attribute 
+        set_atomlist(self,a: list) -> None: Sets the `atomlist` attribute
             to the given list of `atom` objects.
-        read_from_xyz(self,filename: str) -> None: Reads the coordinates of 
+        read_from_xyz(self,filename: str) -> None: Reads the coordinates of
             the atoms in the molecule from an XYZ file.
-        get_basis(self, name: str = "sto-3g") -> None: Computes the 
+        get_basis(self, name: str = "sto-3g") -> None: Computes the
             basis functions for the molecule using the specified basis set.
-        get_S(self) -> None: Computes the overlap integrals between 
+        get_S(self) -> None: Computes the overlap integrals between
             basis functions and sets the `S` attribute.
     """
 
@@ -48,7 +71,7 @@ class Molecule:
         Sets the `atomlist` attribute to the given list of `Atom` objects.
 
         Parameters:
-            a (list): A list of `Atom` objects representing the atoms 
+            a (list): A list of `Atom` objects representing the atoms
                 in the molecule.
 
         Returns:
@@ -65,29 +88,9 @@ class Molecule:
             self.atomlist.append(at)
         self.natom = len(self.atomlist)
 
-    def read_from_xyz(self, filename: str) -> None:
+    def set_basis(self, name: str = "sto-3g") -> None:
         """
-        Reads the coordinates of the atoms in the molecule from an XYZ file.
-
-        Parameters:
-            filename (str): The name of the XYZ file to read.
-
-        Returns:
-            None
-        """
-        with open(filename, "r") as f:
-            for line in f:
-                tmp = line.split()
-                if len(tmp) == 4:
-                    symbol = tmp[0]
-                    coord = np.array([float(x) for x in tmp[1:]]) / a0
-                    at = Atom(symbol, coord)
-                    self.atomlist.append(at)
-        self.natom = len(self.atomlist)
-
-    def get_basis(self, name: str = "sto-3g") -> None:
-        """
-        Computes the basis functions for the molecule using the 
+        Computes the basis functions for the molecule using the
         specified basis set.
 
         Parameters:
@@ -110,9 +113,9 @@ class Molecule:
                 newbf.set_A(at.coord)
                 self.basisfunctions.append(newbf)
 
-    def get_S(self) -> None:
+    def produce_S(self) -> None:
         """
-        Computes the overlap integrals between basis functions and sets 
+        Computes the overlap integrals between basis functions and sets
         the `S` attribute.
 
         Returns:
@@ -122,5 +125,5 @@ class Molecule:
         self.S = np.zeros((nbf, nbf))
         for i in np.arange(0, nbf):
             for j in np.arange(i, nbf):
-                self.S[i,j] = self.basisfunctions[i].S(self.basisfunctions[j])
-                self.S[j,i] = self.S[i,j]
+                self.S[i, j] = self.basisfunctions[i].S(self.basisfunctions[j])
+                self.S[j, i] = self.S[i, j]
