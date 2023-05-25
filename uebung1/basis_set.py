@@ -9,7 +9,7 @@ class Gaussian:
     A class representing a Cartesian Gaussian function for molecular integrals.
     """
 
-    def __init__(self, A, exps, coefs, ijk):
+    def __init__(self, A, exps, coefs, ijk, atomic_number, ang_mom):
         """
         Initialize the Gaussian function with given parameters.
 
@@ -19,11 +19,15 @@ class Gaussian:
         coefs (array-like): A list of coefficients.
         ijk (tuple): A tuple representing the angular momentum components 
             (l, m, n).
+        atomic_number (int): atomic number of center
+        ang_mom (int): angular momentum of center
         """
         self.A = np.asarray(A)
         self.exps = np.asarray(exps)
         self.coefs = np.asarray(coefs)
         self.ijk = ijk
+        self.atomic_number = atomic_number
+        self.ang_mom = ang_mom
         self.get_norm_constants()
 
     def set_A(self, A):
@@ -146,7 +150,7 @@ class BasisSet:
                     # Generate Gaussian basis functions for each 
                     # angular momentum component
                     for ikm in self.cartesian_power[angmom]:
-                        basisfunction = Gaussian(np.zeros(3), exps, coefs, ikm)
+                        basisfunction = Gaussian(np.zeros(3), exps, coefs, ikm, ATOMIC_NUMBER[element], angmom)
                         # Normalize the basis functions using the S method 
                         # of the Gaussian class
                         norm = basisfunction.S(basisfunction)
