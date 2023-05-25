@@ -1,7 +1,7 @@
 from numpy import sqrt, exp, pi
 
 
-def Sij(i, j, alpha, beta, Ax, Bx):
+def s_ij(i, j, alpha, beta, Ax, Bx):
     AB_diff = Ax - Bx 
     AB_sum = alpha + beta 
     AB_product = alpha * beta 
