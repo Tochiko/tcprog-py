@@ -3,7 +3,7 @@
 
 """Implementation of the Extended Hückel Theory"""
 
-from molecule import Molecule
+from molecule import Molecule, a0
 from atom import Atom
 import numpy as np
 import os
@@ -13,6 +13,7 @@ from numpy import linalg as LA
 valence_electrons = {'H' : 1, 'C' : 4, 'N' : 5, 'O' : 6}
 
 eV_in_Hartree = 1/27.2114079527
+v_0 = 0.52917721
 
 class EHT:
     def __init__(self, molecule: Molecule, basis_set_name: str, parameter_name: str):
@@ -32,6 +33,9 @@ class EHT:
             return None
 
     def getEnergy(self) -> float:
+
+        atoms = self.molecule.atomlist
+
         self.molecule.get_basis(name = self.basis_set_name)
         self.molecule.get_S()
         S = self.molecule.S
@@ -49,13 +53,33 @@ class EHT:
         H = np.multiply(np.einsum('a,b->ab',k,k),np.multiply(alpha_matrix,S))
         np.fill_diagonal(H,alpha)
         eigenvalues, _ = LA.eigh(H)
-        num_valence_elec = np.sum(np.array([valence_electrons[at.symbol] for at in self.molecule.atomlist]))
+        num_valence_elec = np.sum(np.array([valence_electrons[at.symbol] for at in atoms]))
 
         E_elec = 2*np.sum(eigenvalues[:num_valence_elec//2])
         if num_valence_elec%2==1:
             E_elec += eigenvalues[num_valence_elec//2+1]
+
+        atom_pairs_i, atom_pairs_j = np.triu_indices(len(atoms),1)
         
-        return E_elec
+        dist_pairs_ang = np.array([a0*LA.norm(atoms[i].coord - atoms[j].coord) for i,j in zip(atom_pairs_i, atom_pairs_j)])
+        z_a = np.array([valence_electrons[atoms[i].symbol] for i in atom_pairs_i])
+        z_b = np.array([valence_electrons[atoms[j].symbol] for j in atom_pairs_j])
+        a_a = np.array([params['elements'][str(atoms[i].atnum)]['a'] for i in atom_pairs_i])
+        a_b = np.array([params['elements'][str(atoms[j].atnum)]['a'] for j in atom_pairs_j])
+        b_a = np.array([params['elements'][str(atoms[i].atnum)]['b'] for i in atom_pairs_i])
+        b_b = np.array([params['elements'][str(atoms[j].atnum)]['b'] for j in atom_pairs_j])
+        c_a = np.array([params['elements'][str(atoms[i].atnum)]['c'] for i in atom_pairs_i])
+        c_b = np.array([params['elements'][str(atoms[j].atnum)]['c'] for j in atom_pairs_j])
+        gamma_a = np.array([params['elements'][str(atoms[i].atnum)]['gamma'] for i in atom_pairs_i])
+        gamma_b = np.array([params['elements'][str(atoms[j].atnum)]['gamma'] for j in atom_pairs_j])
+        epsilon_a = np.array([params['elements'][str(atoms[i].atnum)]['epsilon'] for i in atom_pairs_i])
+        epsilon_b = np.array([params['elements'][str(atoms[j].atnum)]['epsilon'] for j in atom_pairs_j])   
+
+        E_elec_rep = np.sum( v_0 * z_a * z_b / (dist_pairs_ang + c_a + c_b) * np.exp(-(a_a + a_b) * np.power(dist_pairs_ang, b_a + b_b)))
+
+        E_nuc_rep = np.sum( v_0 * z_a * z_b / dist_pairs_ang * np.exp(-(gamma_a + gamma_b) * np.power(dist_pairs_ang, epsilon_a + epsilon_b)))
+
+        return E_elec+E_nuc_rep+E_elec_rep
 
 if __name__=='__main__':
     # Coordinates are in the unit of Angstrom.
