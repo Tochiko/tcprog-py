@@ -78,6 +78,8 @@ class Molecule:
         self.EHT_MOs = None
         self.EHT_MO_Energies = None
         self.EHT_Total_Energy = 0
+        self.KLOPMAN_ELEC_REP_Energy = 0
+        self.KLOPMAN_NUC_REP_Energy = 0
 
     def set_atomlist(self, a: list) -> None:
         """
@@ -91,6 +93,8 @@ class Molecule:
             None
         """
         self.atomlist = []
+        self.nelectrons = 0
+        self.n_velectrons = 0
         for at in a:
             if at.unit == 'A':
                 at.coord = at.coord / a0
@@ -152,22 +156,24 @@ class Molecule:
                     gaussian = self.basisfunctions[i]
                     l = np.array(gaussian.ijk).sum()
                     if l > 1: raise NotImplementedError('there are no eht parameters for d-orbitals')
-                    parameter = parm.A_S if l == 0 else parm.A_P
-                    self.EHT_H[i, j] = parm.PARAMETERS[parameter][gaussian.symbol] * factor
+                    parameter = parm.AO_A_S if l == 0 else parm.AO_A_P
+                    self.EHT_H[i, j] = parm.AO_PARAMS[parameter][gaussian.symbol] * factor
                 else:
                     gaussian_i = self.basisfunctions[i]
                     gaussian_j = self.basisfunctions[j]
                     l_i = np.array(gaussian_i.ijk).sum()
                     l_j = np.array(gaussian_j.ijk).sum()
                     if l_i > 1 or l_j > 1: raise NotImplementedError('there are no eht parameters for d-orbitals')
-                    parameter_i = parm.K_S if l_i == 0 else parm.K_P
-                    parameter_j = parm.K_S if l_j == 0 else parm.K_P
+                    parameter_i = parm.AO_K_S if l_i == 0 else parm.AO_K_P
+                    parameter_j = parm.AO_K_S if l_j == 0 else parm.AO_K_P
                     symbol_i = gaussian_i.symbol
                     symbol_j = gaussian_j.symbol
-                    self.EHT_H[i, j] = parm.PARAMETERS[parameter_i][symbol_i] * \
-                                       parm.PARAMETERS[parameter_j][symbol_j] * \
-                                       (parm.PARAMETERS[parm.A_S if parameter_i == parm.K_S else parm.A_P][symbol_i] +
-                                        parm.PARAMETERS[parm.A_S if parameter_j == parm.K_S else parm.A_P][symbol_j]) * \
+                    self.EHT_H[i, j] = parm.AO_PARAMS[parameter_i][symbol_i] * \
+                                       parm.AO_PARAMS[parameter_j][symbol_j] * \
+                                       (parm.AO_PARAMS[parm.AO_A_S if parameter_i == parm.AO_K_S else parm.AO_A_P][
+                                            symbol_i] +
+                                        parm.AO_PARAMS[parm.AO_A_S if parameter_j == parm.AO_K_S else parm.AO_A_P][
+                                            symbol_j]) * \
                                        gaussian_i.S(gaussian_j) * factor
                     self.EHT_H[j, i] = self.EHT_H[i, j]
 
@@ -178,3 +184,34 @@ class Molecule:
         if self.nelectrons % 2 != 0: raise NotImplementedError('only close shell systems are implemented')
         n_occ = self.n_velectrons // 2
         self.EHT_Total_Energy = (2 * self.EHT_MO_Energies[0:n_occ]).sum()
+
+    def klopman_repulsion_energies(self):
+        self.KLOPMAN_ELEC_REP_Energy = 0
+        self.KLOPMAN_NUC_REP_Energy = 0
+        v0 = 0.52917721  # a. u.
+
+        for i in range(len(self.atomlist)):
+            for j in range(i + 1, len(self.atomlist)):
+                atom_i = self.atomlist[i]
+                atom_j = self.atomlist[j]
+                r_ij = np.linalg.norm(atom_i.coord - atom_j.coord)  # atom coords are already in angstrom
+                z_i = atom_i.velectrons
+                z_j = atom_j.velectrons
+                a_i = parm.E_REP_PARAMS[parm.E_REP_A][atom_i.symbol]
+                a_j = parm.E_REP_PARAMS[parm.E_REP_A][atom_j.symbol]
+                b_i = parm.E_REP_PARAMS[parm.E_REP_B][atom_i.symbol]
+                b_j = parm.E_REP_PARAMS[parm.E_REP_B][atom_j.symbol]
+                c_i = parm.E_REP_PARAMS[parm.E_REP_C][atom_i.symbol]
+                c_j = parm.E_REP_PARAMS[parm.E_REP_C][atom_j.symbol]
+                d_i = parm.E_REP_PARAMS[parm.E_REP_D][atom_i.symbol]
+                d_j = parm.E_REP_PARAMS[parm.E_REP_D][atom_j.symbol]
+                e_i = parm.E_REP_PARAMS[parm.E_REP_E][atom_i.symbol]
+                e_j = parm.E_REP_PARAMS[parm.E_REP_E][atom_j.symbol]
+
+                self.KLOPMAN_ELEC_REP_Energy += v0 * ((z_i * z_j) / (r_ij + c_i + c_j)) * np.exp(
+                    -(a_i + a_j) * (r_ij ** (b_i + b_j)))
+
+                self.KLOPMAN_NUC_REP_Energy += v0 * (z_i*z_j/r_ij)*np.exp(-(d_i+d_j)*(r_ij**(e_i+e_j)))
+
+    def get_total_energy_klopman_eht(self):
+        return self.EHT_Total_Energy + self.KLOPMAN_ELEC_REP_Energy + self.KLOPMAN_NUC_REP_Energy
