@@ -3,7 +3,7 @@ import molecule
 import matplotlib.pyplot as plt
 
 
-if not os.path.isfile('./overlap.py'): exec(open('init.py').read())
+if not os.path.isfile('overlap.py'): exec(open('init.py').read())
 
 molecule = molecule.from_xyz('propanol.xyz')
 molecule.set_basis()

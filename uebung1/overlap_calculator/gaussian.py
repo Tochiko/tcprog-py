@@ -1,7 +1,4 @@
 import numpy as np
-import json
-import os
-from atomic_data import ATOMIC_NUMBER
 import overlap
 
 
@@ -10,7 +7,7 @@ class Gaussian:
     A class representing a Cartesian Gaussian function for molecular integrals.
     """
 
-    def __init__(self, A, exps, coefs, ijk):
+    def __init__(self, A, exps, coefs, ijk, symbol: str = None):
         """
         Initialize the Gaussian function with given parameters.
 
@@ -26,6 +23,7 @@ class Gaussian:
         self.coefs = np.asarray(coefs)
         self.ijk = ijk
         self.get_norm_constants()
+        self.symbol = symbol
 
     def set_A(self, A):
         """

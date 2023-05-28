@@ -2,8 +2,10 @@ import json
 import os
 import numpy as np
 from atomic_data import ATOMIC_NUMBER
+from gaussian import Gaussian
 
-from uebung1.gaussian import Gaussian
+STO3G = 'sto-3g'
+VSTO3G = 'vsto-3g'
 
 
 class BasisSet:
@@ -39,7 +41,7 @@ class BasisSet:
         try:
             # Load the basis set data from a JSON file
             with open(
-                os.path.join(path, f"{self.name}.json"), "r",
+                    os.path.join(path, f"{self.name}.json"), "r",
             ) as basisfile:
                 basisdata = json.load(basisfile)
         except FileNotFoundError:
@@ -62,7 +64,7 @@ class BasisSet:
                     # Generate Gaussian basis functions for each
                     # angular momentum component
                     for ikm in self.cartesian_power[angmom]:
-                        basisfunction = Gaussian(np.zeros(3), exps, coefs, ikm)
+                        basisfunction = Gaussian(np.zeros(3), exps, coefs, ikm, element)
                         # Normalize the basis functions using the S method
                         # of the Gaussian class
                         norm = basisfunction.S(basisfunction)
