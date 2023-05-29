@@ -8,9 +8,10 @@ from atomic_data import ATOMIC_NUMBER
 
 a0 = 0.529177210903  # Bohr radius in angstrom
 
+
 # todo: der import aus xyz-files muss am ende auch über den konstruktor gehen. Das hier ist eine Fehlerquelle,
 #  da viele Initialisierungsschritte vergessen werden können! Gerade sind einige nicht berücksichtigt!!
-def from_xyz(filename: str) -> 'Molecule':
+def from_xyz(filename: str, basis_set: str = bs.STO3G) -> 'Molecule':
     """
     Reads the coordinates of the atoms in the molecule from an XYZ file.
 
@@ -19,18 +20,20 @@ def from_xyz(filename: str) -> 'Molecule':
 
     Returns:
         Molecule
+        :param filename:
+        :param basis_set:
     """
-    molecule = Molecule()
+    atoms = []
     with open(filename) as f:
         for line in f:
             tmp = line.split()
             if len(tmp) == 4:
                 symbol = tmp[0]
-                coord = np.array([float(x) for x in tmp[1:]]) / a0
+                coord = [float(x) for x in tmp[1:]]
                 at = Atom(symbol, coord)
-                molecule.atomlist.append(at)
-    molecule.natom = len(molecule.atomlist)
-    return molecule
+                atoms.append(at)
+
+    return Molecule(atoms, basis_set)
 
 
 class Molecule:
@@ -108,7 +111,7 @@ class Molecule:
             self.atomlist.append(at)
         self.natom = len(self.atomlist)
 
-    def set_basis(self, name: str = "sto-3g") -> None:
+    def set_basis(self, name: str = bs.STO3G) -> None:
         """
         Computes the basis functions for the molecule using the
         specified basis set.
@@ -213,7 +216,7 @@ class Molecule:
                 self.KLOPMAN_ELEC_REP_Energy += v0 * ((z_i * z_j) / (r_ij + c_i + c_j)) * np.exp(
                     -(a_i + a_j) * (r_ij ** (b_i + b_j)))
 
-                self.KLOPMAN_NUC_REP_Energy += v0 * (z_i*z_j/r_ij)*np.exp(-(d_i+d_j)*(r_ij**(e_i+e_j)))
+                self.KLOPMAN_NUC_REP_Energy += v0 * (z_i * z_j / r_ij) * np.exp(-(d_i + d_j) * (r_ij ** (e_i + e_j)))
 
     def get_total_energy_klopman_eht(self):
         return self.EHT_Total_Energy + self.KLOPMAN_ELEC_REP_Energy + self.KLOPMAN_NUC_REP_Energy
