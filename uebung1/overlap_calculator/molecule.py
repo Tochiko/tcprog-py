@@ -8,7 +8,8 @@ from atomic_data import ATOMIC_NUMBER
 
 a0 = 0.529177210903  # Bohr radius in angstrom
 
-
+# todo: der import aus xyz-files muss am ende auch über den konstruktor gehen. Das hier ist eine Fehlerquelle,
+#  da viele Initialisierungsschritte vergessen werden können! Gerade sind einige nicht berücksichtigt!!
 def from_xyz(filename: str) -> 'Molecule':
     """
     Reads the coordinates of the atoms in the molecule from an XYZ file.
@@ -195,6 +196,7 @@ class Molecule:
                 atom_i = self.atomlist[i]
                 atom_j = self.atomlist[j]
                 r_ij = np.linalg.norm(atom_i.coord - atom_j.coord)  # atom coords are already in angstrom
+                r_ij = r_ij * a0 if atom_i.unit == 'A' else r_ij
                 z_i = atom_i.velectrons
                 z_j = atom_j.velectrons
                 a_i = parm.E_REP_PARAMS[parm.E_REP_A][atom_i.symbol]
