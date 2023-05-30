@@ -16,7 +16,7 @@ for file in os.listdir('./data'):
         mol.eht_total_energy()
         mol.klopman_repulsion_energies()
         molecule_energies[file] = mol.get_total_energy_klopman_eht()
-        if abs(vj.MOL_ENERGIES_JG[file] - mol.get_total_energy_klopman_eht()) > 1e-2:
+        if abs(vj.MOL_ENERGIES_JG[file] - mol.get_total_energy_klopman_eht()) > 1e-3:
             print(file + ': '+str(vj.MOL_ENERGIES_JG[file] - mol.get_total_energy_klopman_eht()))
     except NotImplementedError:
         print(file + ': is not implemented')
