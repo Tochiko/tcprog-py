@@ -157,7 +157,7 @@ class Molecule:
                 if i == j:
                     gaussian = self.basisfunctions[i]
                     l = np.array(gaussian.ijk).sum()
-                    if l > 1: raise NotImplementedError('there are no eht parameters for d-orbitals')
+                    if l > 1: raise NotImplementedError('there are no eht parameters for higher orbitals such as p-orbs')
                     parameter = parm.AO_A_S if l == 0 else parm.AO_A_P
                     self.EHT_H[i, j] = parm.AO_PARAMS[parameter][gaussian.symbol] * factor
                 else:
@@ -165,7 +165,8 @@ class Molecule:
                     gaussian_j = self.basisfunctions[j]
                     l_i = np.array(gaussian_i.ijk).sum()
                     l_j = np.array(gaussian_j.ijk).sum()
-                    if l_i > 1 or l_j > 1: raise NotImplementedError('there are no eht parameters for d-orbitals')
+                    if l_i > 1 or l_j > 1: raise NotImplementedError('there are no eht parameters for higher orbitals '
+                                                                     'such as p-orbs')
                     parameter_i = parm.AO_K_S if l_i == 0 else parm.AO_K_P
                     parameter_j = parm.AO_K_S if l_j == 0 else parm.AO_K_P
                     symbol_i = gaussian_i.symbol
