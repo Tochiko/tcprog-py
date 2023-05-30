@@ -6,11 +6,9 @@ from atom import Atom
 import scipy.constants as const
 from atomic_data import ATOMIC_NUMBER
 
-a0 = 0.529177210903  # Bohr radius in angstrom
+a0 = const.physical_constants['Bohr radius'][0]*1e10
 
 
-# todo: der import aus xyz-files muss am ende auch über den konstruktor gehen. Das hier ist eine Fehlerquelle,
-#  da viele Initialisierungsschritte vergessen werden können! Gerade sind einige nicht berücksichtigt!!
 def from_xyz(filename: str, basis_set: str = bs.STO3G) -> 'Molecule':
     """
     Reads the coordinates of the atoms in the molecule from an XYZ file.
@@ -172,13 +170,14 @@ class Molecule:
                     parameter_j = parm.AO_K_S if l_j == 0 else parm.AO_K_P
                     symbol_i = gaussian_i.symbol
                     symbol_j = gaussian_j.symbol
-                    self.EHT_H[i, j] = parm.AO_PARAMS[parameter_i][symbol_i] * \
-                                       parm.AO_PARAMS[parameter_j][symbol_j] * \
-                                       (parm.AO_PARAMS[parm.AO_A_S if parameter_i == parm.AO_K_S else parm.AO_A_P][
-                                            symbol_i] +
-                                        parm.AO_PARAMS[parm.AO_A_S if parameter_j == parm.AO_K_S else parm.AO_A_P][
-                                            symbol_j]) * \
-                                       gaussian_i.S(gaussian_j) * factor
+
+                    k_i = parm.AO_PARAMS[parameter_i][symbol_i]
+                    k_j = parm.AO_PARAMS[parameter_j][symbol_j]
+                    H_ii = parm.AO_PARAMS[parm.AO_A_S if parameter_i == parm.AO_K_S else parm.AO_A_P][symbol_i]
+                    H_jj = parm.AO_PARAMS[parm.AO_A_S if parameter_j == parm.AO_K_S else parm.AO_A_P][symbol_j]
+                    s_ij = gaussian_i.S(gaussian_j)
+
+                    self.EHT_H[i, j] = k_i * k_j * (H_ii + H_jj) * s_ij * factor
                     self.EHT_H[j, i] = self.EHT_H[i, j]
 
     def solve_eht(self):
