@@ -146,6 +146,9 @@ class Molecule:
         self.S = np.zeros((self.nbf, self.nbf))
         for i in np.arange(0, self.nbf):
             for j in np.arange(i, self.nbf):
+                if i == j:
+                    self.S[i, j] = 1
+                    continue
                 self.S[i, j] = self.basisfunctions[i].S(self.basisfunctions[j])
                 self.S[j, i] = self.S[i, j]
 

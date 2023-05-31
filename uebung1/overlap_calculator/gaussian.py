@@ -18,11 +18,13 @@ class Gaussian:
         ijk (tuple): A tuple representing the angular momentum components
             (l, m, n).
         """
+        self.norm_const = None
+        self.normalized_coefs = None
         self.A = np.asarray(A)
         self.exps = np.asarray(exps)
         self.coefs = np.asarray(coefs)
         self.ijk = ijk
-        self.get_norm_constants()
+        self.init_norm_constants()
         self.symbol = symbol
 
     def set_A(self, A):
@@ -34,11 +36,12 @@ class Gaussian:
         """
         self.A = np.asarray(A)
 
-    def get_norm_constants(self):
+    def init_norm_constants(self):
         """
         Calculate the normalization constants for the Gaussian function.
         """
         self.norm_const = np.zeros(self.coefs.shape)
+        self.normalized_coefs = np.zeros(self.coefs.shape)
         for i, alpha in enumerate(self.exps):
             a = overlap.s_ij(self.ijk[0], self.ijk[0], alpha, alpha,
                              self.A[0], self.A[0])
@@ -47,6 +50,7 @@ class Gaussian:
             c = overlap.s_ij(self.ijk[2], self.ijk[2], alpha, alpha,
                              self.A[2], self.A[2])
             self.norm_const[i] = 1.0 / np.sqrt(a * b * c)
+        self.normalized_coefs = self.coefs * self.norm_const
 
     def __str__(self):
         """
@@ -74,17 +78,11 @@ class Gaussian:
         float: The overlap integral value.
         """
         result = np.array([
-            ci * cj * a * b * c * normi * normj
+            overlap.s_ij(self.ijk[0], other.ijk[0], alphai, alphaj, self.A[0], other.A[0])
+            * overlap.s_ij(self.ijk[1], other.ijk[1], alphai, alphaj, self.A[1], other.A[1])
+            * overlap.s_ij(self.ijk[2], other.ijk[2], alphai, alphaj, self.A[2], other.A[2])
+            * ci * cj * normi * normj
             for ci, alphai, normi in zip(self.coefs, self.exps, self.norm_const)
             for cj, alphaj, normj in zip(other.coefs, other.exps, other.norm_const)
-            for a in [
-                overlap.s_ij(self.ijk[0], other.ijk[0], alphai, alphaj, self.A[0], other.A[0])
-            ]
-            for b in [
-                overlap.s_ij(self.ijk[1], other.ijk[1], alphai, alphaj, self.A[1], other.A[1])
-            ]
-            for c in [
-                overlap.s_ij(self.ijk[2], other.ijk[2], alphai, alphaj, self.A[2], other.A[2])
-            ]
         ])
         return result.sum()
