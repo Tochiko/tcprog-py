@@ -10,7 +10,7 @@ molecule_energies = {}
 
 for file in os.listdir('./data'):
     try:
-        mol = molecule.from_xyz('./data/'+file, bs.VSTO3G)
+        mol = molecule.from_xyz('./uebung1_Robin/data/'+file, '')
         mol.eht_hamiltonian()
         mol.solve_eht()
         mol.eht_total_energy()
