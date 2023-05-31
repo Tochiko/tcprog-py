@@ -26,7 +26,7 @@ class BasisSet:
         """
         self.name = name
 
-    def get_basisfunctions(self, elementlist, path="."):
+    def get_basisfunctions(self, elementlist, path="./basis_sets"):
         """
         Generate the basis functions for a list of elements.
 
@@ -39,7 +39,7 @@ class BasisSet:
             Gaussian basis functions.
         """
         try:
-            # Load the basis set data from a JSON file
+            # Load the basis set test_data from a JSON file
             with open(
                     os.path.join(path, f"{self.name}.json"), "r",
             ) as basisfile:
@@ -52,7 +52,7 @@ class BasisSet:
 
         for element in elementlist:
             basisfunctions = []
-            # Get the basis function data for the current element
+            # Get the basis function test_data for the current element
             # from the JSON file
             basisfunctionsdata = basisdata["elements"][
                 str(ATOMIC_NUMBER[element])

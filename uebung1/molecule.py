@@ -66,6 +66,8 @@ class Molecule:
         Returns:
             None
         """
+        self.atomlist = None
+        self.basisfunctions = None
         self.natom = 0
         self.nelectrons = 0
         self.n_velectrons = 0
@@ -135,7 +137,7 @@ class Molecule:
                 self.basisfunctions.append(newbf)
         self.nbf = len(self.basisfunctions)
 
-    def produce_S(self) -> None:
+    def calc_S(self) -> None:
         """
         Computes the overlap integrals between basis functions and sets
         the `S` attribute.
@@ -146,7 +148,7 @@ class Molecule:
         self.S = np.zeros((self.nbf, self.nbf))
         for i in np.arange(0, self.nbf):
             for j in np.arange(i, self.nbf):
-                if i == j:
+                if i == j: # we use normalized gaussians
                     self.S[i, j] = 1
                     continue
                 self.S[i, j] = self.basisfunctions[i].S(self.basisfunctions[j])
@@ -155,7 +157,7 @@ class Molecule:
     def eht_hamiltonian(self, unit='hartree'):
         factor = 1 if unit == 'eV' else const.physical_constants['electron volt-hartree relationship'][0]
         self.EHT_H = np.zeros((self.nbf, self.nbf))
-        self.produce_S()
+        self.calc_S()
         for i in np.arange(0, self.nbf):
             for j in np.arange(i, self.nbf):
                 if i == j:

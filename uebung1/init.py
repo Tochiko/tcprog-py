@@ -140,5 +140,5 @@ printer._module = 'np'
 printer.known_functions = _numpy_known_functions
 printer.known_constants = _numpy_known_constants
 
-MY_PATH = '..'
+MY_PATH = ''
 write_overlaps_py(s_ij, printer, path=MY_PATH)
