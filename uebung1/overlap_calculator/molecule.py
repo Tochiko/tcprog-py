@@ -152,6 +152,7 @@ class Molecule:
     def eht_hamiltonian(self, unit='hartree'):
         factor = 1 if unit == 'eV' else const.physical_constants['electron volt-hartree relationship'][0]
         self.EHT_H = np.zeros((self.nbf, self.nbf))
+        self.produce_S()
         for i in np.arange(0, self.nbf):
             for j in np.arange(i, self.nbf):
                 if i == j:
@@ -176,7 +177,8 @@ class Molecule:
                     k_j = parm.AO_PARAMS[parameter_j][symbol_j]
                     H_ii = parm.AO_PARAMS[parm.AO_A_S if parameter_i == parm.AO_K_S else parm.AO_A_P][symbol_i]
                     H_jj = parm.AO_PARAMS[parm.AO_A_S if parameter_j == parm.AO_K_S else parm.AO_A_P][symbol_j]
-                    s_ij = gaussian_i.S(gaussian_j)
+                    #s_ij = gaussian_i.S(gaussian_j)
+                    s_ij = self.S[i][j]
 
                     self.EHT_H[i, j] = k_i * k_j * (H_ii + H_jj) * s_ij * factor
                     self.EHT_H[j, i] = self.EHT_H[i, j]
