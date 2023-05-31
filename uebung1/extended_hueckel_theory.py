@@ -33,13 +33,12 @@ class EHT:
             return None
 
     def getEnergy(self) -> float:
-
+        atoms = self.molecule.atomlist
         num_valence_elec = np.sum(np.array([valence_electrons[at.atnum] for at in atoms]))
         if num_valence_elec%2==1:
             print("Not closed shell!")
             return 0
 
-        atoms = self.molecule.atomlist
         atom_numbers = [at.atnum for at in atoms]
         set_atoms = set(atom_numbers)
         atom_numbers = np.array(atom_numbers)
