@@ -1,8 +1,8 @@
 import json
 import os
 import numpy as np
-from atomic_data import ATOMIC_NUMBER
-from gaussian import Gaussian
+from uebung1_Robin.overlap_calculator.atomic_data import ATOMIC_NUMBER
+from uebung1_Robin.overlap_calculator.gaussian import Gaussian
 
 STO3G = 'sto-3g'
 VSTO3G = 'vsto-3g'

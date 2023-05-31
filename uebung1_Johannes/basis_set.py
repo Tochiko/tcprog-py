@@ -1,8 +1,8 @@
 import numpy as np
 import json
 import os
-from atomic_data import ATOMIC_NUMBER
-import S
+from uebung1_Johannes.atomic_data import ATOMIC_NUMBER
+import uebung1_Johannes.S as S
 
 class Gaussian:
     """

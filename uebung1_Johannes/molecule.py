@@ -1,7 +1,7 @@
 import numpy as np
 import copy
-from atom import Atom
-from basis_set import BasisSet
+from uebung1_Johannes.atom import Atom
+from uebung1_Johannes.basis_set import BasisSet
 
 a0 = 0.529177210903  # Bohr radius in angstrom
 

@@ -3,8 +3,8 @@
 
 """Implementation of the Extended Hückel Theory"""
 
-from molecule import Molecule, a0
-from atom import Atom
+from uebung1_Johannes.molecule import Molecule, a0
+from uebung1_Johannes.atom import Atom
 import numpy as np
 import os
 import json
@@ -34,12 +34,13 @@ class EHT:
 
     def getEnergy(self) -> float:
 
+        atoms = self.molecule.atomlist
+
         num_valence_elec = np.sum(np.array([valence_electrons[at.atnum] for at in atoms]))
         if num_valence_elec%2==1:
             print("Not closed shell!")
             return 0
 
-        atoms = self.molecule.atomlist
         atom_numbers = [at.atnum for at in atoms]
         set_atoms = set(atom_numbers)
         atom_numbers = np.array(atom_numbers)

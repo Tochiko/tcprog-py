@@ -1,10 +1,10 @@
 import numpy as np
 import copy
-import basis_set as bs
-import eht_parameters as parm
-from atom import Atom
+import uebung1_Robin.overlap_calculator.basis_set as bs
+import uebung1_Robin.overlap_calculator.eht_parameters as parm
+from uebung1_Robin.overlap_calculator.atom import Atom
 import scipy.constants as const
-from atomic_data import ATOMIC_NUMBER
+from uebung1_Robin.overlap_calculator.atomic_data import ATOMIC_NUMBER
 
 a0 = const.physical_constants['Bohr radius'][0]*1e10
 

@@ -1,6 +1,7 @@
 import numpy as np
 import os
 import sys
+import time
 
 atom_energy_dict = {"Corannulene.xyz" : -61.06299,
 "D-Galactose.xyz" : -53.05407,
@@ -253,24 +254,46 @@ atom_energy_dict = {"Corannulene.xyz" : -61.06299,
 "Beta-D-fructopyranose.xyz" : -53.11724,
 "C165.xyz" : -454.09309}
 
-def moleculeCalculator(xyz_file):
-    from extended_hueckel_theory import EHT
-    from molecule import Molecule
-    mol = Molecule()
+from uebung1_Johannes.extended_hueckel_theory import EHT as EHT_Jo
+from uebung1_Johannes.extended_hueckel_theory import Molecule as Mol_Jo
+def moleculeCalculatorJohannes(xyz_file):
+    mol = Mol_Jo()
     mol.read_from_xyz(xyz_file)
-    eht = EHT(mol, 'uebung1/vsto-3g', 'uebung1/eth-params')
+    eht = EHT_Jo(mol, 'uebung1_Johannes/vsto-3g', 'uebung1_Johannes/eth-params')
     return eht.getEnergy()
 
-path_to_test_molecules = '/Users/johannes/Documents/Uni/Programmierpraktikum/uebungen/tcprog-py/uebung1/test_molecules'
+import uebung1_Robin.overlap_calculator.molecule as mo_r
+import uebung1_Robin.overlap_calculator.basis_set as bs_r
+def moleculeCalculatorRobin(xyz_file):
+    mol = mo_r.from_xyz(xyz_file, 'uebung1_Robin/overlap_calculator/vsto-3g')
+    mol.eht_hamiltonian()
+    mol.solve_eht()
+    mol.eht_total_energy()
+    mol.klopman_repulsion_energies()
+    return mol.get_total_energy_klopman_eht()
+
+path_to_test_molecules = '/Users/johannes/Documents/Uni/Programmierpraktikum/uebungen/tcprog-py/test_molecules'
 
 structures = atom_energy_dict.keys()
 num_structures = len(structures)
-passed = 0
-sys.stdout.write(f'Calculating {0}/{num_structures}, passed: {passed}/{num_structures}')
+johannes_times = []
+robin_times = []
+
+sys.stdout.write(f'Calculating {0}/{num_structures}')
 sys.stdout.flush()
 for i, structure in enumerate(structures):
-    e = moleculeCalculator(os.path.join(path_to_test_molecules,structure))
-    if np.isclose(e,atom_energy_dict[structure],rtol=1e-4):
-        passed += 1
-    sys.stdout.write(f'\rCalculating {i+1}/{num_structures}, passed: {passed}/{num_structures}')
+    start = time.perf_counter()
+    eJohannes = moleculeCalculatorJohannes(os.path.join(path_to_test_molecules,structure))
+    johannes_times.append(time.perf_counter() - start)
+    start = time.perf_counter()
+    eRobin = moleculeCalculatorRobin(os.path.join(path_to_test_molecules,structure))
+    robin_times.append(time.perf_counter() - start)
+    sys.stdout.write(f'\rCalculating {i+1}/{num_structures}')
     sys.stdout.flush()
+
+np_johannes = np.array(johannes_times)
+np_robin = np.array(robin_times)
+np.save("/.johannes",np_johannes)
+np.save("./robin",np_robin)
+print('Johannes:',np.sum(np_johannes))
+print('Robin:',np.sum(np_robin))

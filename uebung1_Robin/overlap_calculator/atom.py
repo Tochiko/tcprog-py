@@ -1,5 +1,5 @@
 import numpy as np
-from atomic_data import ATOMIC_NUMBER
+from uebung1_Robin.overlap_calculator.atomic_data import ATOMIC_NUMBER
 
 
 def get_period(atomic_number):

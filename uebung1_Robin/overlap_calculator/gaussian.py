@@ -1,5 +1,5 @@
 import numpy as np
-import overlap
+import uebung1_Robin.overlap_calculator.overlap as overlap
 
 
 class Gaussian:

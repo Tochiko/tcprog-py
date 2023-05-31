@@ -1,5 +1,5 @@
 import numpy as np
-from atomic_data import ATOMIC_NUMBER
+from uebung1_Johannes.atomic_data import ATOMIC_NUMBER
 
 class Atom:
     """
