@@ -10,7 +10,7 @@ import os
 import json
 from numpy import linalg as LA
 
-valence_electrons = {'H' : 1, 'C' : 4, 'N' : 5, 'O' : 6}
+valence_electrons = {1 : 1, 6 : 4, 7 : 5, 8 : 6}
 
 eV_in_Hartree = 1/27.2114079527
 v_0 = 0.52917721
@@ -34,7 +34,16 @@ class EHT:
 
     def getEnergy(self) -> float:
 
+        num_valence_elec = np.sum(np.array([valence_electrons[at.atnum] for at in atoms]))
+        if num_valence_elec%2==1:
+            print("Not closed shell!")
+            return 0
+
         atoms = self.molecule.atomlist
+        atom_numbers = [at.atnum for at in atoms]
+        set_atoms = set(atom_numbers)
+        atom_numbers = np.array(atom_numbers)
+
 
         self.molecule.get_basis(name = self.basis_set_name)
         self.molecule.get_S()
@@ -53,27 +62,49 @@ class EHT:
         H = np.multiply(np.einsum('a,b->ab',k,k),np.multiply(alpha_matrix,S))
         np.fill_diagonal(H,alpha)
         eigenvalues, _ = LA.eigh(H)
-        num_valence_elec = np.sum(np.array([valence_electrons[at.symbol] for at in atoms]))
 
         E_elec = 2*np.sum(eigenvalues[:num_valence_elec//2])
-        if num_valence_elec%2==1:
-            E_elec += eigenvalues[num_valence_elec//2+1]
 
         atom_pairs_i, atom_pairs_j = np.triu_indices(len(atoms),1)
-        
+        pair_size = len(atom_pairs_i)
+
+        z_a = np.zeros((pair_size))
+        z_b = np.zeros((pair_size))
+        a_a = np.zeros((pair_size))
+        a_b = np.zeros((pair_size))
+        b_a = np.zeros((pair_size))
+        b_b = np.zeros((pair_size))
+        c_a = np.zeros((pair_size))
+        c_b = np.zeros((pair_size))
+        gamma_a = np.zeros((pair_size))
+        gamma_b = np.zeros((pair_size))
+        epsilon_a = np.zeros((pair_size))
+        epsilon_b = np.zeros((pair_size))
+
         dist_pairs_ang = np.array([a0*LA.norm(atoms[i].coord - atoms[j].coord) for i,j in zip(atom_pairs_i, atom_pairs_j)])
-        z_a = np.array([valence_electrons[atoms[i].symbol] for i in atom_pairs_i])
-        z_b = np.array([valence_electrons[atoms[j].symbol] for j in atom_pairs_j])
-        a_a = np.array([params['elements'][str(atoms[i].atnum)]['a'] for i in atom_pairs_i])
-        a_b = np.array([params['elements'][str(atoms[j].atnum)]['a'] for j in atom_pairs_j])
-        b_a = np.array([params['elements'][str(atoms[i].atnum)]['b'] for i in atom_pairs_i])
-        b_b = np.array([params['elements'][str(atoms[j].atnum)]['b'] for j in atom_pairs_j])
-        c_a = np.array([params['elements'][str(atoms[i].atnum)]['c'] for i in atom_pairs_i])
-        c_b = np.array([params['elements'][str(atoms[j].atnum)]['c'] for j in atom_pairs_j])
-        gamma_a = np.array([params['elements'][str(atoms[i].atnum)]['gamma'] for i in atom_pairs_i])
-        gamma_b = np.array([params['elements'][str(atoms[j].atnum)]['gamma'] for j in atom_pairs_j])
-        epsilon_a = np.array([params['elements'][str(atoms[i].atnum)]['epsilon'] for i in atom_pairs_i])
-        epsilon_b = np.array([params['elements'][str(atoms[j].atnum)]['epsilon'] for j in atom_pairs_j])   
+
+        for atom_species in set_atoms:
+
+            mask_i = atom_numbers[atom_pairs_i] == atom_species
+            mask_j = atom_numbers[atom_pairs_j] == atom_species
+            z = valence_electrons[atom_species]
+            a = params['elements'][str(atom_species)]['a']
+            b = params['elements'][str(atom_species)]['b']
+            c = params['elements'][str(atom_species)]['c']
+            gamma = params['elements'][str(atom_species)]['gamma']
+            epsilon = params['elements'][str(atom_species)]['epsilon']
+            z_a[mask_i] = z
+            z_b[mask_j] = z
+            a_a[mask_i] = a
+            a_b[mask_j] = a
+            b_a[mask_i] = b
+            b_b[mask_j] = b
+            c_a[mask_i] = c
+            c_b[mask_j] = c
+            gamma_a[mask_i] = gamma
+            gamma_b[mask_j] = gamma
+            epsilon_a[mask_i] = epsilon
+            epsilon_b[mask_j] = epsilon
 
         E_elec_rep = np.sum( v_0 * z_a * z_b / (dist_pairs_ang + c_a + c_b) * np.exp(-(a_a + a_b) * np.power(dist_pairs_ang, b_a + b_b)))
 
