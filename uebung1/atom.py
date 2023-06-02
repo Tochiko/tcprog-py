@@ -29,7 +29,7 @@ class Atom:
             Initializes a new atom with the given symbol and coordinate.
     """
 
-    def __init__(self, symbol: str, coord: list[float], unit='A') -> None:
+    def __init__(self, symbol: str, coord: list, unit='A') -> None:
         """
         Initializes a new `atom` object.
 

@@ -52,6 +52,28 @@ class Gaussian:
             self.norm_const[i] = 1.0 / np.sqrt(a * b * c)
         self.normalized_coefs = self.coefs * self.norm_const
 
+    def evaluate(self, pos): 
+        A_stack = np.tile(self.A,(pos.shape[0],1))
+        dist_square = np.sum(np.square(pos-A_stack),axis=1)
+        ikj_np = np.array([self.ijk[0],self.ijk[1],self.ijk[2]])
+        ikj_stack = np.tile(ikj_np,(pos.shape[0],1))
+        power_single_dist=np.power(pos-A_stack,ikj_stack)
+        power_single_dist=np.prod(power_single_dist,axis=1)
+        e_func = np.exp(-1*np.outer(dist_square,self.exps))
+        e_func_with_coefficents = np.dot(e_func, self.coefs*self.norm_const)
+        return power_single_dist*e_func_with_coefficents
+    
+    def evaluate_primitiv(self, pos):
+        results = []
+        for p in pos:
+            summe = 0
+            for coef, exps, norm in zip(self.coefs,self.exps,self.norm_const):
+                summe += coef*norm*(p[0]-self.A[0])**self.ijk[0]*\
+                (p[1]-self.A[1])**self.ijk[1]*(p[2]-self.A[2])**self.ijk[2]*\
+                np.exp(-exps*np.sum(np.square(p-self.A)))
+            results.append(summe)
+        return np.array(results)
+    
     def __str__(self):
         """
         Generate a string representation of the Gaussian function.
@@ -86,3 +108,9 @@ class Gaussian:
             for cj, alphaj, normj in zip(other.coefs, other.exps, other.norm_const)
         ])
         return result.sum()
+    
+if __name__ == '__main__':
+    g1 = Gaussian([0.,0.,0.],[3.,2.],[0.5,0.5],(0,0,1),"C")
+    pos = np.array([[0,0,1],[0,0,0.5],[0,0.5,0.5]])
+    print(g1.evaluate(pos))
+    print(g1.evaluate_primitiv(pos))
