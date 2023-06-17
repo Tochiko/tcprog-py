@@ -33,6 +33,11 @@ def from_xyz(filename: str, basis_set: str = bs.STO3G) -> 'Molecule':
 
     return Molecule(atoms, basis_set)
 
+def from_flat(coords, symbols):
+    atoms = []
+    for index, symbol in enumerate(symbols):
+        atoms.append(Atom(symbol, coords[index*3:(index+1)*3], unit='A'))
+    return Molecule(atoms)
 
 class Molecule:
     """
@@ -227,3 +232,41 @@ class Molecule:
 
     def get_total_energy_klopman_eht(self):
         return self.EHT_Total_Energy + self.KLOPMAN_ELEC_REP_Energy + self.KLOPMAN_NUC_REP_Energy
+    
+    def get_flatten_Coords_and_Symbols(self):
+        coords = np.zeros((3*self.natom))
+        symbols = []
+        for i, atom in enumerate(self.atomlist):
+            coords[3*i:3*(i+1)] = atom.coord*a0
+            symbols.append(atom.symbol)
+
+        return coords, symbols
+    
+    def __str__(self):
+        result = ""
+        for atom in self.atomlist:
+            result += f'{atom.symbol} {atom.coord[0]:7.4f} {atom.coord[1]:7.4f} {atom.coord[2]:7.4f}\n'
+        return result
+    
+    def get_bond_angle(self, indices, unit="degree"):
+        assert len(indices) == 3
+        assert max(indices) < len(indices)
+        assert min(indices) > -1
+        assert unit in ["degree","radians"]
+        ba = self.atomlist[indices[0]].coord - self.atomlist[indices[1]].coord
+        bc = self.atomlist[indices[2]].coord - self.atomlist[indices[1]].coord
+        angle = np.arccos((np.inner(ba,bc))/(np.linalg.norm(ba)*np.linalg.norm(bc)))
+        if unit == "degree":
+            return 180*angle/np.pi
+        return angle
+    
+    def get_bond_length(self, indices, unit="A"):
+        assert len(indices) == 2
+        assert max(indices) < len(indices)
+        assert min(indices) > -1
+        assert unit in ["A","B"]
+        ba = self.atomlist[indices[0]].coord - self.atomlist[indices[1]].coord
+        dist = np.linalg.norm(ba)
+        if unit == "A":
+            return dist*a0
+        return dist
