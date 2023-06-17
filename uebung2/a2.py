@@ -6,8 +6,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.colors import LogNorm
-from objective_function import RosenbrockFunction, \
-    plot_2d_optimisation
+from objective_function import RosenbrockFunction, plot_2d_optimisation
 from optimiser import SimpleSteepestDescent, SimpleConjugateGradient
 
 if __name__ == '__main__':
