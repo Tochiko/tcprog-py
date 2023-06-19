@@ -3,7 +3,7 @@ import molecule
 import basis_set as bs
 from uebung1.test_data.results import values_jg as vj
 
-"""if not os.path.isfile('overlap.py'): exec(open('init.py').read())
+"""if not os.path.isfile('overlap.py'): exec(open('init_overlap.py').read())
 molecule_energies = {}
 
 for file in os.listdir('./test_data/xyz_files'):
