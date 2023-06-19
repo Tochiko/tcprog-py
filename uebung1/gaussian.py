@@ -1,5 +1,6 @@
 import numpy as np
 import overlap
+import V
 
 
 class Gaussian:
@@ -84,5 +85,31 @@ class Gaussian:
             * ci * cj * normi * normj
             for ci, alphai, normi in zip(self.coefs, self.exps, self.norm_const)
             for cj, alphaj, normj in zip(other.coefs, other.exps, other.norm_const)
+        ])
+        return result.sum()
+
+    def VC(self, other, RC):
+        """
+        Calculate the nuclear attraction integral between this Gaussian and
+        another Gaussian function.
+
+        Parameters:
+
+        other (Gaussian): Another Gaussian function.
+        RC (array-like): The coordinates of the nucleus.
+
+        Returns:
+        float: The nuclear attraction integral value.
+        """
+        result = np.array([
+            ci * cj * normi * normj * V.v_ij(
+                self.ijk[0], self.ijk[1], self.ijk[2],
+                other.ijk[0], other.ijk[1], other.ijk[2],
+                alphai, alphaj, self.A, other.A, RC,
+            )
+            for ci, alphai, normi in zip(self.coefs, self.exps,
+                                         self.norm_const)
+            for cj, alphaj, normj in zip(other.coefs, other.exps,
+                                         other.norm_const)
         ])
         return result.sum()

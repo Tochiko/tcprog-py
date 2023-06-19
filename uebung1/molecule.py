@@ -66,6 +66,7 @@ class Molecule:
         Returns:
             None
         """
+        self.V_EK = None
         self.atomlist = None
         self.basisfunctions = None
         self.natom = 0
@@ -227,3 +228,18 @@ class Molecule:
 
     def get_total_energy_klopman_eht(self):
         return self.EHT_Total_Energy + self.KLOPMAN_ELEC_REP_Energy + self.KLOPMAN_NUC_REP_Energy
+
+    def get_Vij(self, i, j) -> float:
+        v_int = 0.0
+        for at in self.atomlist:
+            v_int -= at.atnum \
+                * self.basisfunctions[i].VC(self.basisfunctions[j], at.coord)
+        return v_int
+
+    def calc_V(self) -> None:
+        nbf = len(self.basisfunctions)
+        self.V_EK = np.zeros((nbf, nbf))
+        for i in np.arange(nbf):
+            for j in np.arange(i, nbf):
+                self.V_EK[i, j] = self.get_Vij(i, j)
+                self.V_EK[j, i] = self.V_EK[i, j]
