@@ -70,7 +70,7 @@ s_ij = generate_overlaps(LMAX)
 s_ij = {k: v.subs(subsdict) for (k, v) in s_ij.items()}
 
 def write_overlaps_py(overlaps, printer, path=''):
-    with open(os.path.join(path, 'overlap.py'), 'w') as f:
+    with open(os.path.join(path, 'S.py'), 'w') as f:
         f.write('import numpy as np\n')
         f.write('sqrt_pi = np.sqrt(np.pi)\n')
         f.write('def s_ij(i, j, alpha, beta, ax, bx):\n')

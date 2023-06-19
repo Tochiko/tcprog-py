@@ -66,6 +66,7 @@ class Molecule:
         Returns:
             None
         """
+        self.T = None
         self.V_EK = None
         self.atomlist = None
         self.basisfunctions = None
@@ -244,5 +245,9 @@ class Molecule:
                 self.V_EK[i, j] = self.get_Vij(i, j)
                 self.V_EK[j, i] = self.V_EK[i, j]
 
-    def get_T(self) -> None:
-        pass
+    def calc_T(self) -> None:
+        self.T = np.zeros((self.nbf, self.nbf))
+        for i in np.arange(0, self.nbf):
+            for j in np.arange(0, self.nbf):
+                self.T[i, j] = self.basisfunctions[i].T(self.basisfunctions[j])
+                #self.S[j, i] = self.S[i, j]
