@@ -28,6 +28,9 @@ class Gaussian:
         self.init_norm_constants()
         self.symbol = symbol
 
+    def set_ijk(self, ijk):
+        self.ijk = ijk
+
     def set_A(self, A):
         """
         Set the origin of the Gaussian function.
@@ -113,3 +116,6 @@ class Gaussian:
                                          other.norm_const)
         ])
         return result.sum()
+
+    def T(self, other):
+        pass

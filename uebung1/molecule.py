@@ -243,3 +243,6 @@ class Molecule:
             for j in np.arange(i, nbf):
                 self.V_EK[i, j] = self.get_Vij(i, j)
                 self.V_EK[j, i] = self.V_EK[i, j]
+
+    def get_T(self) -> None:
+        pass

@@ -51,7 +51,7 @@ def generate_overlaps(lmax):
     return overlaps
 
 
-LMAX = 2
+LMAX = 3
 
 # Substitute repeated expressions
 X_AB, X_AB_SQ, P, Q = sp.symbols(
@@ -65,7 +65,7 @@ subsdict = {
     alpha * beta: Q,
 }
 
-s_ij = generate_overlaps(2)
+s_ij = generate_overlaps(LMAX)
 
 s_ij = {k: v.subs(subsdict) for (k, v) in s_ij.items()}
 
