@@ -1,9 +1,6 @@
-import copy
-
 import numpy as np
 import S
 import V
-import T
 import gaussian_1D
 
 
@@ -126,11 +123,11 @@ class Gaussian:
 
     def getGauss1D(self, dimension):
         A = self.A[dimension]
-        exp = self.exps[dimension]
-        coeff = self.coefs[dimension]
+        exps = self.exps
+        coefs = self.coefs
         i = self.ijk[dimension]
 
-        return gaussian_1D.Gaussian1D(A, exp, coeff, i, self.symbol)
+        return gaussian_1D.Gaussian1D(A, exps, coefs, i, self.symbol)
 
 
     def T(self, other: 'Gaussian'):
