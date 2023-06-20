@@ -1,6 +1,5 @@
 import numpy as np
 import S
-import V
 import T
 
 
@@ -28,5 +27,9 @@ class Gaussian1D:
 
         s_ij = self.S(other)
         s_ij_p2 = self.S(gjp2)
+        s_ij_m2 = 0
+        if other.i >= 2:
+            gjm2 = Gaussian1D(other.A, other.exp, other.coeff, other.i-2, other.symbol)
+            s_ij_m2 = self.S(gjm2)
 
-        return T.T_ij(self.i, other.i, other.exp, s_ij, 0, s_ij_p2)
+        return T.T_ij(self.i, other.i, other.exp, s_ij, s_ij_m2, s_ij_p2)
