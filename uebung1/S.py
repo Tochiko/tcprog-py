@@ -1,5 +1,7 @@
 import numpy as np
+from functools import lru_cache
 sqrt_pi = np.sqrt(np.pi)
+@lru_cache(maxsize=128)
 def s_ij(i, j, alpha, beta, ax, bx):
     ab_diff = ax - bx
     ab_diff_squared = ab_diff**2
