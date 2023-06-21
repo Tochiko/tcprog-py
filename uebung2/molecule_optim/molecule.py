@@ -64,7 +64,7 @@ class Molecule:
             basis functions and sets the `S` attribute.
     """
 
-    def __init__(self, atom_list: [Atom] = None, basis_set: str = bs.STO3G) -> None:
+    def __init__(self, atom_list: list[Atom] = None, basis_set: str = bs.STO3G) -> None:
         """
         Initializes a new `Molecule` object.
 
@@ -161,8 +161,8 @@ class Molecule:
 
     def calc_T(self) -> None:
         """
-        Computes the overlap integrals between basis functions and sets
-        the `S` attribute.
+        Computes the kinetic energy integrals between basis functions and sets
+        the `T` attribute.
 
         Returns:
             None

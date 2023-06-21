@@ -92,14 +92,14 @@ class Gaussian:
     
     def T(self, other):
         """
-        Calculate the overlap integral between this Gaussian and
+        Calculate the kinetic energy integral between this Gaussian and
         another Gaussian function.
 
         Parameters:
         other (Gaussian): Another Gaussian function.
 
         Returns:
-        float: The overlap integral value.
+        float: The kinetic energy integral value.
         """
         indeces = [0,1,2,0,1]
         result = np.array([
