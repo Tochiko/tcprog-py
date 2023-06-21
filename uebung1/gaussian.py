@@ -92,9 +92,6 @@ class Gaussian:
         ])
         return result.sum()
 
-    def S_1D(self, other):
-        result = S.s_ij(self.ijk, other.ijk, self.exps, other.exps, self.A, other.A)*self.coefs*other.coeffs*self.norm_const*other.norm_const
-
     def VC(self, other, RC):
         """
         Calculate the nuclear attraction integral between this Gaussian and
@@ -129,7 +126,6 @@ class Gaussian:
 
         return gaussian_1D.Gaussian1D(A, exps, coefs, i, self.symbol)
 
-
     def T(self, other: 'Gaussian'):
         s_ij_list = []
         t_ij_list = []
@@ -140,4 +136,4 @@ class Gaussian:
             s_ij_list.append(gi.S(gj))
             t_ij_list.append(gi.T(gj))
 
-        return t_ij_list[0]*s_ij_list[1]*s_ij_list[2] + t_ij_list[1]*s_ij_list[0]*s_ij_list[2] + t_ij_list[2]*s_ij_list[0]*s_ij_list[1]
+        return t_ij_list[0] * s_ij_list[1] * s_ij_list[2] + t_ij_list[1] * s_ij_list[0] * s_ij_list[2] + t_ij_list[2] * s_ij_list[0] * s_ij_list[1]
