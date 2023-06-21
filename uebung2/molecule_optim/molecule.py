@@ -159,6 +159,20 @@ class Molecule:
                 self.S[i, j] = self.basisfunctions[i].S(self.basisfunctions[j])
                 self.S[j, i] = self.S[i, j]
 
+    def calc_T(self) -> None:
+        """
+        Computes the overlap integrals between basis functions and sets
+        the `S` attribute.
+
+        Returns:
+            None
+        """
+        self.T = np.zeros((self.nbf, self.nbf))
+        for i in np.arange(0, self.nbf):
+            for j in np.arange(i, self.nbf):
+                self.T[i, j] = self.basisfunctions[i].T(self.basisfunctions[j])
+                self.T[j, i] = self.T[i, j]
+
     def eht_hamiltonian(self, unit='hartree'):
         factor = 1 if unit == 'eV' else const.physical_constants['electron volt-hartree relationship'][0]
         self.EHT_H = np.zeros((self.nbf, self.nbf))

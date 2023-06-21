@@ -1,5 +1,7 @@
 import numpy as np
 import overlap
+import T
+from functools import lru_cache
 
 
 class Gaussian:
@@ -66,6 +68,7 @@ class Gaussian:
         strrep += "Angular momentum: {}".format(self.ijk)
         return strrep
 
+    @lru_cache(maxsize=200)
     def S(self, other):
         """
         Calculate the overlap integral between this Gaussian and
@@ -84,5 +87,28 @@ class Gaussian:
             * ci * cj * normi * normj
             for ci, alphai, normi in zip(self.coefs, self.exps, self.norm_const)
             for cj, alphaj, normj in zip(other.coefs, other.exps, other.norm_const)
+        ])
+        return result.sum()
+    
+    def T(self, other):
+        """
+        Calculate the overlap integral between this Gaussian and
+        another Gaussian function.
+
+        Parameters:
+        other (Gaussian): Another Gaussian function.
+
+        Returns:
+        float: The overlap integral value.
+        """
+        indeces = [0,1,2,0,1]
+        result = np.array([
+            T.t_ij(self.ijk[indeces[ind]], other.ijk[indeces[ind]], alphai, alphaj, self.A[indeces[ind]], other.A[indeces[ind]])
+            * overlap.s_ij(self.ijk[indeces[ind+1]], other.ijk[indeces[ind+1]], alphai, alphaj, self.A[indeces[ind+1]], other.A[indeces[ind+1]])
+            * overlap.s_ij(self.ijk[indeces[ind+2]], other.ijk[indeces[ind+2]], alphai, alphaj, self.A[indeces[ind+2]], other.A[indeces[ind+2]])
+            * ci * cj * normi * normj
+            for ci, alphai, normi in zip(self.coefs, self.exps, self.norm_const)
+            for cj, alphaj, normj in zip(other.coefs, other.exps, other.norm_const)
+            for ind in range(3)
         ])
         return result.sum()
