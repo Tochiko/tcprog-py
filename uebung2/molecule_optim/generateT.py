@@ -83,7 +83,7 @@ def get_single_overlap(i, j, hermite_overlaps):
     return overlap
 
 def generate_overlaps(lmax):
-    hermite_overlaps = generate_hermite_overlaps(lmax+2)
+    hermite_overlaps = generate_hermite_overlaps(lmax+2) #code manipulation
 
     overlaps = {}
     # Loop through all combinations of Gaussian functions up to order lmax
