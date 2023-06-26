@@ -1,7 +1,7 @@
 import numpy as np
 import overlap
 import T
-from functools import lru_cache
+
 
 
 class Gaussian:
@@ -68,7 +68,6 @@ class Gaussian:
         strrep += "Angular momentum: {}".format(self.ijk)
         return strrep
 
-    @lru_cache(maxsize=200)
     def S(self, other):
         """
         Calculate the overlap integral between this Gaussian and

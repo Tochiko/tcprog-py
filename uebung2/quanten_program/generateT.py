@@ -86,7 +86,7 @@ def generate_overlaps(lmax):
     hermite_overlaps = generate_hermite_overlaps(lmax+2) #code manipulation
 
     overlaps = {}
-    # Loop through all combinations of Gaussian functions up to order lmax
+    # Loop through all combinations of Gaussian functions up to order lmax and lmax+2
     for i in range(lmax + 1):
         for j in range(lmax + 3): #code manipulation
             # Store the overlap integral in the dictionary with the key (i, j)
@@ -102,7 +102,7 @@ def generate_T(lmax):
     ts = {}
     # Loop through all combinations of Gaussian functions up to order lmax
     for i in range(lmax + 1):
-        for j in range(lmax + 1): #code manipulation
+        for j in range(lmax + 1):
             # Store the overlap integral in the dictionary with the key (i, j)
             if j - 2 < 0:
                 ts[(i, j)] = sp.sympify(-2) * beta ** 2 * s_ij[i, j + 2] +\
@@ -144,7 +144,7 @@ def write_Ts_py(Ts, printer, path=''):
 
 
 LMAX = 1
-MY_PATH = 'uebung2/molecule_optim/'
+MY_PATH = 'uebung2/quanten_program/'
 
 ts = generate_T(LMAX)
 ts = {k: v.subs(subsdict_ts) for (k, v) in ts.items()}
