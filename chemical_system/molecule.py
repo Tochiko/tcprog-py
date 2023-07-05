@@ -1,10 +1,13 @@
 import numpy as np
 import copy
-import basis_set as bs
-import eht_parameters as parm
-from atom import Atom
+
+from numpy import ndarray
+
+from basis_sets import basis_set as bs
+from chemical_system import eht_parameters as parm
+from chemical_system import atom
 import scipy.constants as const
-from atomic_data import ATOMIC_NUMBER
+from chemical_system import atomic_data
 
 a0 = const.physical_constants['Bohr radius'][0]*1e10
 
@@ -59,7 +62,7 @@ class Molecule:
             basis functions and sets the `S` attribute.
     """
 
-    def __init__(self, atom_list: [Atom] = None, basis_set: str = bs.STO3G) -> None:
+    def __init__(self, atom_list: [atom.Atom] = None, basis_set: str = bs.STO3G) -> None:
         """
         Initializes a new `Molecule` object.
 
@@ -106,7 +109,7 @@ class Molecule:
                 pass
             else:
                 raise ValueError('Invalid unit for atom coordinates.')
-            self.nelectrons += ATOMIC_NUMBER[at.symbol]
+            self.nelectrons += atomic_data.ATOMIC_NUMBER[at.symbol]
             self.n_velectrons += at.velectrons
             self.atomlist.append(at)
         self.natom = len(self.atomlist)
@@ -137,14 +140,7 @@ class Molecule:
                 self.basisfunctions.append(newbf)
         self.nbf = len(self.basisfunctions)
 
-    def calc_S(self) -> None:
-        """
-        Computes the overlap integrals between basis functions and sets
-        the `S` attribute.
-
-        Returns:
-            None
-        """
+    def calc_S(self) -> ndarray:
         self.S = np.zeros((self.nbf, self.nbf))
         for i in np.arange(0, self.nbf):
             for j in np.arange(i, self.nbf):
@@ -153,6 +149,7 @@ class Molecule:
                     continue
                 self.S[i, j] = self.basisfunctions[i].S(self.basisfunctions[j])
                 self.S[j, i] = self.S[i, j]
+        return self.S
 
     def eht_hamiltonian(self, unit='hartree'):
         factor = 1 if unit == 'eV' else const.physical_constants['electron volt-hartree relationship'][0]

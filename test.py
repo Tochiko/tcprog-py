@@ -1,9 +1,7 @@
-import os.path
-import molecule
-import basis_set as bs
-from uebung1.test_data.results import values_jg as vj
+from chemical_system import molecule
+from basis_sets import basis_set as bs
 
-"""if not os.path.isfile('overlap.py'): exec(open('init.py').read())
+"""if not os.path.isfile('overlap.py'): exec(open('init_S.py').read())
 molecule_energies = {}
 
 for file in os.listdir('./test_data/xyz_files'):
@@ -35,7 +33,7 @@ def perf_eht(mol):
 import cProfile
 import pstats
 
-cur = molecule.from_xyz('./test_data/xyz_files/'+'Cucurbit-8-uril.xyz', bs.VSTO3G)
+cur = molecule.from_xyz('./test_data/xyz_files/' + 'Cucurbit-8-uril.xyz', bs.VSTO3G)
 with cProfile.Profile() as pr:
     perf_eht(cur)
 stats = pstats.Stats(pr)

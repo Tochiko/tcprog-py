@@ -3,39 +3,8 @@ from functools import lru_cache
 from sympy.printing.numpy import NumPyPrinter, \
     _known_functions_numpy, _known_constants_numpy
 import os
+from hermite_expansion import get_ckn
 
-
-@lru_cache(maxsize=None)
-def get_ckn(k, n, p):
-    """
-    Calculate the expansion coefficient C_{k,n} for a
-    Cartesian Gaussian basis function with angular momentum n
-    in terms of Hermite Gaussians of order k.
-
-    The recursive formula used is:
-    C_{k, n} = 1/(2 * p) * C_{k-1, n-1} + (k + 1) * C_{k+1, n-1}
-
-    Args:
-        k (int): Order of the Hermite Gaussian function.
-        n (int): Angular momentum of the Cartesian Gaussian basis function.
-        p (float): Exponent of the Gaussian functions.
-
-    Returns:
-        float: Expansion coefficient C_{k, n}.
-    """
-    if k == n == 0:
-        return sp.sympify(1)
-    elif (k == 0) and (n == 1):
-        return sp.sympify(0)
-    elif (k == 1) and (n == 1):
-        return 1 / (2 * p)
-    elif k > n:
-        return sp.sympify(0)
-    elif k < 0:
-        return sp.sympify(0)
-    else:
-        return (1 / (2 * p)) * get_ckn(k - 1, n - 1, p) \
-            + (k + 1) * get_ckn(k + 1, n - 1, p)
 
 
 # Initialisation of symbolic variables
@@ -103,7 +72,7 @@ s_ij = generate_overlaps(2)
 s_ij = {k: v.subs(subsdict) for (k, v) in s_ij.items()}
 
 def write_overlaps_py(overlaps, printer, path=''):
-    with open(os.path.join(path, 'overlap.py'), 'w') as f:
+    with open(os.path.join(path, './S.py'), 'w') as f:
         f.write('import numpy as np\n')
         f.write('sqrt_pi = np.sqrt(np.pi)\n')
         f.write('def s_ij(i, j, alpha, beta, ax, bx):\n')

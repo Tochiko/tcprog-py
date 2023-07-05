@@ -1,13 +1,16 @@
-import atom as at
-import molecule as mol
-import basis_set as bs
+from chemical_system import atom as at, molecule as mol
+from basis_sets import basis_set as bs
 
 # Coordinates are in the unit of Angstrom.
 o1 = at.Atom('O', [0.000, 0.000, 0.000], unit='A')
 h1 = at.Atom('H', [1.000, 0.000, 0.000], unit='A')
 h2 = at.Atom('H', [0.000, 1.000, 0.000], unit='A')
 
-# Problem 1 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+m = mol.Molecule([o1, h1, h2], bs.STO3G)
+S = m.calc_S()
+print(S)
+
+"""# Problem 1 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 # a)--------------------------------------------------------------------------------------------------------------------
 print(' 1 a) OVERLAP MATRIX <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n')
 h2o = mol.Molecule([o1, h1, h2], bs.VSTO3G)
@@ -49,4 +52,4 @@ print('\n')
 # c)--------------------------------------------------------------------------------------------------------------------
 print('2 c) TOTAL ENERGY + V_EE + V_NN <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
 print(h2o.get_total_energy_klopman_eht())
-print('\n')
+print('\n')"""

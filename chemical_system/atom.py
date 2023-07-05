@@ -1,5 +1,5 @@
 import numpy as np
-from atomic_data import ATOMIC_NUMBER
+from chemical_system import atomic_data
 
 
 def get_period(atomic_number):
@@ -43,7 +43,7 @@ class Atom:
         self.symbol = symbol
         self.coord = np.array(coord)
         self.unit = unit
-        self.atnum = ATOMIC_NUMBER[self.symbol]
+        self.atnum = atomic_data.ATOMIC_NUMBER[self.symbol]
         self.period = get_period(self.atnum)
         if self.period == 1: self.velectrons = self.atnum
         else: self.velectrons = self.atnum - (self.period - 2) * 8 - 2
