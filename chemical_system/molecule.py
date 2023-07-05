@@ -83,6 +83,7 @@ class Molecule:
         self.S = None
         self.TElec = None
         self.VNuc = None
+        self.VElec = None
         self.EHT_H = None
         self.EHT_MOs = None
         self.EHT_MO_Energies = None
@@ -174,6 +175,16 @@ class Molecule:
                 self.VNuc[i, j] = self.get_Vij(i, j)
                 self.VNuc[j, i] = self.VNuc[i, j]
         return self.VNuc
+
+    def calc_VElec(self) -> ndarray:
+        self.VElec = np.zeros((self.nbf, self.nbf, self.nbf, self.nbf))
+        for i in np.arange(self.nbf):
+            for j in np.arange(self.nbf):
+                for k in np.arange(self.nbf):
+                    for l in np.arange(self.nbf):
+                        self.VElec[i, j, k, l] = self.basisfunctions[i].VElec(
+                            self.basisfunctions[j], self.basisfunctions[k], self.basisfunctions[l])
+        return self.VElec
 
     def eht_hamiltonian(self, unit='hartree'):
         factor = 1 if unit == 'eV' else const.physical_constants['electron volt-hartree relationship'][0]

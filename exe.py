@@ -13,6 +13,7 @@ m = mol.Molecule([o1, h1, h2], bs.STO3G)
 S = m.calc_S()
 T = m.calc_TElec()
 VNuc = m.calc_VNuc()
+VElec = m.calc_VElec()
 
 m_pyscf = gto.Mole()
 m_pyscf.basis = bs.STO3G
@@ -22,8 +23,9 @@ mf.kernel()
 dm = mf.make_rdm1()
 
 S_ps = m_pyscf.intor('int1e_ovlp')
-V_ps = m_pyscf.intor('int1e_nuc')
+VNuc_ps = m_pyscf.intor('int1e_nuc')
 T_ps = m_pyscf.intor('int1e_kin')
+VElec_ps = m_pyscf.intor('int2e')
 
 print("S-Matrix-----------------------------------------------------------------------------------------------------\n")
 print(np.allclose(S, S_ps), "\n")
@@ -31,6 +33,8 @@ print("TElec--------------------------------------------------------------------
 print(np.allclose(T, T_ps), "\n")
 print("VNuc---------------------------------------------------------------------------------------------------------\n")
 print(np.allclose(VNuc, VNuc), "\n")
+print("VElec--------------------------------------------------------------------------------------------------------\n")
+print(np.allclose(VElec, VElec_ps), "\n")
 
 
 
