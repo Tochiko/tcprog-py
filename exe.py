@@ -2,15 +2,25 @@ import numpy as np
 
 from chemical_system import atom as at, molecule as mol
 from basis_sets import basis_set as bs
+from calculator import RHF
 from calculator import EH
 from pyscf import gto, scf
 
 # Coordinates are in the unit of Angstrom.
-o1 = at.Atom('O', [0.000, 0.000, 0.000], unit='A')
+"""o1 = at.Atom('O', [0.000, 0.000, 0.000], unit='A')
 h1 = at.Atom('H', [1.000, 0.000, 0.000], unit='A')
-h2 = at.Atom('H', [0.000, 1.000, 0.000], unit='A')
+h2 = at.Atom('H', [0.000, 1.000, 0.000], unit='A')"""
+o1 = at.Atom('O', [0.000, 0.000, 0.000], unit='A')
+h1 = at.Atom('H', [0.758, 0.587, 0.000], unit='A')
+h2 = at.Atom('H', [-0.758, 0.587, 0.000], unit='A')
 
-m = mol.Molecule([o1, h1, h2], bs.VSTO3G)
+m = mol.Molecule([o1, h1, h2], bs.STO3G)
+rhf = RHF.RHFCalculator(m)
+rhf.calculate()
+electronic_energy = rhf.get_Electronic_Energy()
+print(electronic_energy)
+
+"""m = mol.Molecule([o1, h1, h2], bs.VSTO3G)
 eh = EH.EHCalculator(m)
 eh.calculate()
 
@@ -30,7 +40,7 @@ print("NRep---------------------------------------------------------------------
 print(nrep, "\n")
 print("total_energy-------------------------------------------------------------------------------------------------\n")
 print(total_energy, "\n")
-
+"""
 
 
 """

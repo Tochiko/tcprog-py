@@ -18,26 +18,9 @@ class BasisSet:
     }
 
     def __init__(self, name="sto-3g"):
-        """
-        Initialize a new basisSet object with the given name.
-
-        Parameters:
-        name (str): The name of the basis set to use.
-        """
         self.name = name
 
     def get_basisfunctions(self, elementlist, path="./basis_sets"):
-        """
-        Generate the basis functions for a list of elements.
-
-        Parameters:
-        elementlist (list): A list of element symbols.
-        path (str): The path to the directory containing the basis set files.
-
-        Returns:
-        dict: A dictionary mapping element symbols to lists of
-            Gaussian basis functions.
-        """
         try:
             # Load the basis set test_data from a JSON file
             with open(
