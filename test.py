@@ -26,9 +26,9 @@ print(molecule_energies)
 def perf_eht(mol):
     mol.eht_hamiltonian()
     mol.solve_eht()
-    mol.eht_total_energy()
+    mol.electronic_energy()
     mol.klopman_repulsion_energies()
-    mol.get_total_energy_klopman_eht()
+    mol.total_energy()
 
 import cProfile
 import pstats

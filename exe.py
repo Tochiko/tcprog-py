@@ -2,6 +2,7 @@ import numpy as np
 
 from chemical_system import atom as at, molecule as mol
 from basis_sets import basis_set as bs
+from calculator import EH
 from pyscf import gto, scf
 
 # Coordinates are in the unit of Angstrom.
@@ -9,6 +10,30 @@ o1 = at.Atom('O', [0.000, 0.000, 0.000], unit='A')
 h1 = at.Atom('H', [1.000, 0.000, 0.000], unit='A')
 h2 = at.Atom('H', [0.000, 1.000, 0.000], unit='A')
 
+m = mol.Molecule([o1, h1, h2], bs.VSTO3G)
+eh = EH.EHCalculator(m)
+eh.calculate()
+
+
+H = eh.get_H()
+electronic_energy = eh.get_Electronic_Energy()
+erep = eh.get_Total_ERep_Klopman()
+nrep = eh.get_Total_NRep_Klopman()
+total_energy = eh.get_Total_Energy()
+print("H-Matrix-----------------------------------------------------------------------------------------------------\n")
+print(H, "\n")
+print("elecgtronic_energy-------------------------------------------------------------------------------------------\n")
+print(electronic_energy, "\n")
+print("ERep---------------------------------------------------------------------------------------------------------\n")
+print(erep, "\n")
+print("NRep---------------------------------------------------------------------------------------------------------\n")
+print(nrep, "\n")
+print("total_energy-------------------------------------------------------------------------------------------------\n")
+print(total_energy, "\n")
+
+
+
+"""
 m = mol.Molecule([o1, h1, h2], bs.STO3G)
 S = m.calc_S()
 T = m.calc_TElec()
@@ -35,49 +60,4 @@ print("VNuc---------------------------------------------------------------------
 print(np.allclose(VNuc, VNuc), "\n")
 print("VElec--------------------------------------------------------------------------------------------------------\n")
 print(np.allclose(VElec, VElec_ps), "\n")
-
-
-
-"""# Problem 1 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-# a)--------------------------------------------------------------------------------------------------------------------
-print(' 1 a) OVERLAP MATRIX <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n')
-h2o = mol.Molecule([o1, h1, h2], bs.VSTO3G)
-h2o.calc_S()
-print(h2o.S)
-print('\n')
-
-# b)--------------------------------------------------------------------------------------------------------------------
-print('1 b) EHT HAMILTON MATRIX <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n')
-h2o.eht_hamiltonian()
-print(h2o.EHT_H)
-print('\n')
-
-# c)--------------------------------------------------------------------------------------------------------------------
-print('1 c) EHT MO-ENERGIES <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< \n')
-h2o.solve_eht()
-print(h2o.EHT_MO_Energies)
-print('\n')
-print('1 c) EHT MO-COEFFICIENTS <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< \n')
-print(h2o.EHT_MOs)
-print('\n')
-
-# d)--------------------------------------------------------------------------------------------------------------------
-print('1 d) EHT TOTAL ENERGY <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n')
-h2o.eht_total_energy()
-print(h2o.EHT_Total_Energy)
-print('\n')
-
-# Problem 2 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-# a), b)----------------------------------------------------------------------------------------------------------------
-print('2 a) ELECTRON-ELECTRON REPULSION ENERGY V_EE BY KLOPMAN AND DIXON <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n')
-h2o.klopman_repulsion_energies()
-print(h2o.KLOPMAN_ELEC_REP_Energy)
-print('\n')
-print('2 b) NUCLEI-NUCLEI REPULSION ENERGY V_NN BY KLOPMAN AND DIXON <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n')
-print(h2o.KLOPMAN_NUC_REP_Energy)
-print('\n')
-
-# c)--------------------------------------------------------------------------------------------------------------------
-print('2 c) TOTAL ENERGY + V_EE + V_NN <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
-print(h2o.get_total_energy_klopman_eht())
-print('\n')"""
+"""
