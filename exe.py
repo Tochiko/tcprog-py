@@ -3,8 +3,12 @@ import numpy as np
 from chemical_system import atom as at, molecule as mol
 from basis_sets import basis_set as bs
 from calculator import RHF
+from util import timelogger
 from calculator import EH
 from pyscf import gto, scf
+
+logger = timelogger.TimeLogger()
+
 
 # Coordinates are in the unit of Angstrom.
 """o1 = at.Atom('O', [0.000, 0.000, 0.000], unit='A')
@@ -14,7 +18,7 @@ o1 = at.Atom('O', [0.000, 0.000, 0.000], unit='A')
 h1 = at.Atom('H', [0.758, 0.587, 0.000], unit='A')
 h2 = at.Atom('H', [-0.758, 0.587, 0.000], unit='A')
 
-m = mol.Molecule([o1, h1, h2], bs.STO3G)
+m = mol.Molecule(logger, [o1, h1, h2], bs.STO3G)
 rhf = RHF.RHFCalculator(m)
 rhf.calculate()
 electronic_energy = rhf.get_Electronic_Energy()

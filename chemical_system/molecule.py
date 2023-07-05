@@ -26,7 +26,8 @@ def from_xyz(filename: str, basis_set: str = bs.STO3G) -> 'Molecule':
 
 
 class Molecule:
-    def __init__(self, atom_list: [atom.Atom] = None, basis_set: str = bs.STO3G) -> None:
+    def __init__(self, logger, atom_list: [atom.Atom] = None, basis_set: str = bs.STO3G) -> None:
+        self.logger = logger
         self.basis_set = basis_set
         self.atomlist = None
         self.basisfunctions = None
@@ -89,6 +90,7 @@ class Molecule:
         return self.VElec
 
     def calc_S(self) -> ndarray:
+        log = self.logger.logAfter('Molecule.calc_S()')
         self.S = np.zeros((self.nbf, self.nbf))
         for i in np.arange(0, self.nbf):
             for j in np.arange(i, self.nbf):
@@ -97,14 +99,17 @@ class Molecule:
                     continue
                 self.S[i, j] = self.basisfunctions[i].S(self.basisfunctions[j])
                 self.S[j, i] = self.S[i, j]
+        log()
         return self.S
 
     def calc_TElec(self) -> ndarray:
+        log = self.logger.logAfter('Molecule.calc_TElec()')
         self.TElec = np.zeros((self.nbf, self.nbf))
         for i in np.arange(0, self.nbf):
             for j in np.arange(i, self.nbf):
                 self.TElec[i, j] = self.basisfunctions[i].TElec(self.basisfunctions[j])
                 self.TElec[j, i] = self.TElec[i, j]
+        log()
         return self.TElec
 
     def get_Vij(self, i, j) -> float:
@@ -114,14 +119,17 @@ class Molecule:
         return v_int
 
     def calc_VNuc(self) -> ndarray:
+        log = self.logger.logAfter('Molecule.calc_VNuc()')
         self.VNuc = np.zeros((self.nbf, self.nbf))
         for i in np.arange(self.nbf):
             for j in np.arange(i, self.nbf):
                 self.VNuc[i, j] = self.get_Vij(i, j)
                 self.VNuc[j, i] = self.VNuc[i, j]
+        log()
         return self.VNuc
 
     def calc_VElec(self) -> ndarray:
+        log = self.logger.logAfter('Molecule.calc_VElec()')
         self.VElec = np.zeros((self.nbf, self.nbf, self.nbf, self.nbf))
         for i in np.arange(self.nbf):
             for j in np.arange(self.nbf):
@@ -129,5 +137,5 @@ class Molecule:
                     for l in np.arange(self.nbf):
                         self.VElec[i, j, k, l] = self.basisfunctions[i].VElec(
                             self.basisfunctions[j], self.basisfunctions[k], self.basisfunctions[l])
+        log()
         return self.VElec
-

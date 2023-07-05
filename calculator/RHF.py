@@ -58,8 +58,8 @@ class RHFCalculator():
             self.p = self.X @ self.p @ self.X.T
             # calculate energy
             energy = np.trace((self.hcore + f) @ self.p)
-            print(f"Iteration {iteration}, Energy = {energy} Hartree")
-            print(f"MO energies: {eigvals}")
+            #print(f"Iteration {iteration}, Energy = {energy} Hartree")
+            #print(f"MO energies: {eigvals}")
             if np.abs(energy - energy_last_iteration) < threshold:
                 break
             energy_last_iteration = energy
