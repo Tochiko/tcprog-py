@@ -113,10 +113,10 @@ class Molecule:
         return self.TElec
 
     def get_Vij(self, i, j) -> float:
-        v_int = 0.0
+        result = 0.0
         for at in self.atomlist:
-            v_int -= at.atnum * self.basisfunctions[i].VNuc(self.basisfunctions[j], at.coord)
-        return v_int
+            result -= at.atnum * self.basisfunctions[i].VNuc(self.basisfunctions[j], at.coord)
+        return result
 
     def calc_VNuc(self) -> ndarray:
         log = self.logger.logAfter('Molecule.calc_VNuc()')

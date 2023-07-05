@@ -65,8 +65,9 @@ class Gaussian:
         result = 0
         for i in range(self.coefs.size):
             for j in range(other.coefs.size):
+                nc = self.coefs[i] * other.coefs[j] * self.norm_const[i] * other.norm_const[j]
                 result += VNuc.v_ij(self.ijk[0], self.ijk[1], self.ijk[2], other.ijk[0], other.ijk[1], other.ijk[2],
-                                    self.exps[i], other.exps[j], self.A, other.A, position)
+                                    self.exps[i], other.exps[j], self.A, other.A, position) * nc
         return result
 
     def VElec(self, o1, o2, o3):
