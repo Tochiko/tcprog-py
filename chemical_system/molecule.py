@@ -139,3 +139,72 @@ class Molecule:
                             self.basisfunctions[j], self.basisfunctions[k], self.basisfunctions[l])
         log()
         return self.VElec
+    
+    #must be named as such :(
+    def get_twoel_symm(self) -> ndarray:
+        log = self.logger.logAfter('Molecule.get_twoel_symm()')
+        self.VElec = np.zeros((self.nbf, self.nbf, self.nbf, self.nbf))
+        for i in np.arange(self.nbf):
+            for j in np.arange(i, self.nbf):
+                for k in np.arange(i, self.nbf):
+                    for l in np.arange(k, self.nbf):
+                        integral = self.basisfunctions[i].VElec(
+                            self.basisfunctions[j], self.basisfunctions[k],
+                            self.basisfunctions[l])
+                        
+                        self.VElec[i, j, k, l] = integral
+                        self.VElec[j, i, k, l] = integral
+                        self.VElec[j, i, l, k] = integral
+                        self.VElec[i, j, l, k] = integral
+                        self.VElec[k, l, i, j] = integral
+                        self.VElec[k, l, j, i] = integral
+                        self.VElec[l, k, j, i] = integral
+                        self.VElec[l, k, i, j] = integral  
+
+        log()
+        return self.VElec
+    
+    #must be named as such :(
+    def get_twoel_screening(self, q_min = 0.001) -> ndarray:
+        log = self.logger.logAfter('Molecule.get_twoel_screening()')
+        if q_min <= 0:
+            return self.get_twoel_symm()
+        
+        threshold = q_min**2
+        self.VElec = np.zeros((self.nbf, self.nbf, self.nbf, self.nbf))
+        #fill symmetric (ij|ij)
+        for i in np.arange(self.nbf):
+            for j in np.arange(i, self.nbf):
+                integral = self.basisfunctions[i].VElec(
+                    self.basisfunctions[j], self.basisfunctions[i],
+                    self.basisfunctions[j])
+               
+                self.VElec[i, j, i, j] = integral
+                self.VElec[j, i, i, j] = integral
+                self.VElec[j, i, j, i] = integral
+                self.VElec[i, j, j, i] = integral
+
+        #fill all and check if it needs to be calculated
+        for i in np.arange(self.nbf):
+            for j in np.arange(i, self.nbf):
+                for k in np.arange(i, self.nbf):
+                    for l in np.arange(k, self.nbf):
+                        # allready calculated
+                        if i == k and j == l:
+                            continue
+                        # check Cauchy-Bunyakovsky-Schwarz inequality
+                        if self.VElec[i, j, i, j]*self.VElec[k, l, k, l] > threshold:
+                            integral = self.basisfunctions[i].VElec(
+                                self.basisfunctions[j], self.basisfunctions[k],
+                                self.basisfunctions[l])
+                            
+                            self.VElec[i, j, k, l] = integral
+                            self.VElec[j, i, k, l] = integral
+                            self.VElec[j, i, l, k] = integral
+                            self.VElec[i, j, l, k] = integral
+                            self.VElec[k, l, i, j] = integral
+                            self.VElec[k, l, j, i] = integral
+                            self.VElec[l, k, j, i] = integral
+                            self.VElec[l, k, i, j] = integral
+        log()
+        return self.VElec
