@@ -3,6 +3,7 @@ import numpy
 import numpy as np
 from integrals import S
 from integrals import TElec
+from integrals import VNuc
 
 
 class Gaussian:
@@ -61,21 +62,10 @@ class Gaussian:
                 tl[2] += t2
         return tl.sum()
 
-    def VNuc(self, other):
-
-
-
-"""
-    def VC(self, other, RC):
-        v_en = 0.0
-        for ci, alphai, normi in zip(self.coefs, self.exps,
-                                     self.norm_const):
-            for cj, alphaj, normj in zip(other.coefs, other.exps,
-                                         other.norm_const):
-                v_en += ci * cj * normi * normj * V.v_ij(
-                    self.ijk[0], self.ijk[1], self.ijk[2],
-                    other.ijk[0], other.ijk[1], other.ijk[2],
-                    alphai, alphaj, self.A, other.A, RC,
-                )
-        return v_en
-"""
+    def VNuc(self, other, position):
+        result = 0
+        for i in range(self.coefs.size):
+            for j in range(other.coefs.size):
+                result += VNuc.v_ij(self.ijk[0], self.ijk[1], self.ijk[2], other.ijk[0], other.ijk[1], other.ijk[2],
+                                    self.exps[i], other.exps[j], self.A, other.A, position)
+        return result
