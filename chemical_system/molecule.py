@@ -31,7 +31,7 @@ def from_xyz(filename: str, basis_set: str = bs.STO3G) -> 'Molecule':
             if len(tmp) == 4:
                 symbol = tmp[0]
                 coord = [float(x) for x in tmp[1:]]
-                at = Atom(symbol, coord)
+                at = atom.Atom(symbol, coord)
                 atoms.append(at)
 
     return Molecule(atoms, basis_set)
@@ -81,6 +81,7 @@ class Molecule:
         self.set_atomlist(atom_list)
         self.set_basis(basis_set)
         self.S = None
+        self.TElec = None
         self.EHT_H = None
         self.EHT_MOs = None
         self.EHT_MO_Energies = None
@@ -150,6 +151,14 @@ class Molecule:
                 self.S[i, j] = self.basisfunctions[i].S(self.basisfunctions[j])
                 self.S[j, i] = self.S[i, j]
         return self.S
+
+    def calc_TElec(self) -> ndarray:
+        self.TElec = np.zeros((self.nbf, self.nbf))
+        for i in np.arange(0, self.nbf):
+            for j in np.arange(i, self.nbf):
+                self.TElec[i,j] = self.basisfunctions[i].TElec(self.basisfunctions[j])
+                self.TElec[j,i] = self.TElec[i,j]
+        return self.TElec
 
     def eht_hamiltonian(self, unit='hartree'):
         factor = 1 if unit == 'eV' else const.physical_constants['electron volt-hartree relationship'][0]
