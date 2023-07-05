@@ -27,6 +27,7 @@ VElec_ps = m_pyscf.intor('int2e')
 VElec_symm = m.calc_VElec_Symm()
 VElec_screened = m.calc_VElec_Screening()
 VElec_symm_screened = m.calc_VElec_Symm_Screening()
+VElec_symm_screened_2 = m.calc_VElec_Symm_Screening(treshold=0.5)
 
 print("Equality of symmetric calculated VElec ----------------------------------------------------------------------\n")
 print(np.allclose(VElec_ps, VElec_symm))
@@ -34,6 +35,8 @@ print("Equality of screened calculated VElec -----------------------------------
 print(np.allclose(VElec_ps, VElec_screened))
 print("Equality of screened and symmetric calculated VElec ---------------------------------------------------------\n")
 print(np.allclose(VElec_ps, VElec_symm_screened))
+print("Equality of screened and symmetric calculated VElec 2 -------------------------------------------------------\n")
+print(np.allclose(VElec_ps, VElec_symm_screened_2, atol=0.8))
 
 print("Aufgabe 2 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n")
 o11 = at.Atom('O', [0.000, 0.000, 0.000], unit='A')

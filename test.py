@@ -20,12 +20,12 @@ dm = mf.make_rdm1()
 VElec_ps = m_pyscf.intor('int2e')
 
 m = molecule.from_xyz(logger, "./test_data/xyz_files/Water.xyz", bs.STO3G)
-VElec = m.calc_VElec_Symm_Screening(treshold=0.5)
-print(np.allclose(VElec_ps, VElec, atol=0.8))
+VElec = m.calc_VElec_Symm_Screening(treshold=0.05)
+print(np.allclose(VElec_ps, VElec, atol=0.08))
 
 m2 = molecule.Molecule(logger, [o1, h1, h2], bs.STO3G)
-calc = RHF.RHFCalculator(m2, screening_treshold=0.5)
-calc.calculate()
+calc = RHF.RHFCalculator(m2)
+calc.calculate(treshold_screening=0.05)
 print(calc.get_Electronic_Energy())
 
 

@@ -4,7 +4,7 @@ from numpy import ndarray
 
 class RHFCalculator():
 
-    def __init__(self, molecule, screening_treshold=1e-6):
+    def __init__(self, molecule):
         self.nocc = 0
         if molecule.nelectrons % 2 != 0:
             raise NotImplementedError("rhf only calculates closed-shell molecules")
@@ -15,9 +15,8 @@ class RHFCalculator():
         self.X = None
         self.scf_energies = None
         self.ElectronicEnergy = 0.
-        self.screening_treshold = screening_treshold
 
-    def __initialize(self):
+    def __initialize(self, treshold_screening=1e-6):
         self.nocc = self.m.nelectrons // 2
 
         # precalculate integrals
@@ -28,7 +27,7 @@ class RHFCalculator():
         if self.m.VNuc is None:
             self.m.calc_VNuc()
         if self.m.VElec is None:
-            self.m.calc_VElec_Symm_Screening(self.screening_treshold)
+            self.m.calc_VElec_Symm_Screening(treshold=treshold_screening)
 
         # orthogonalize AO
         eigval, eigvec = np.linalg.eigh(self.m.S)
@@ -48,8 +47,8 @@ class RHFCalculator():
         )
         return self.hcore + g
 
-    def calculate(self, max_iter=100, threshold=1e-6, alpha=0.5):
-        self.__initialize()
+    def calculate(self, max_iter=100, threshold=1e-6, alpha=0.5, treshold_screening=1e-6):
+        self.__initialize(treshold_screening=treshold_screening)
         energy_last_iteration = 0.0
         P_old = np.copy(self.P)
         self.scf_energies = []
