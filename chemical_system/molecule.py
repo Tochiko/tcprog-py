@@ -11,7 +11,7 @@ import scipy.constants as const
 a0 = const.physical_constants['Bohr radius'][0] * 1e10
 
 
-def from_xyz(filename: str, basis_set: str = bs.STO3G) -> 'Molecule':
+def from_xyz(logger, filename: str, basis_set: str = bs.STO3G) -> 'Molecule':
     atoms = []
     with open(filename) as f:
         for line in f:
@@ -22,7 +22,7 @@ def from_xyz(filename: str, basis_set: str = bs.STO3G) -> 'Molecule':
                 at = atom.Atom(symbol, coord)
                 atoms.append(at)
 
-    return Molecule(atoms, basis_set)
+    return Molecule(logger, atoms, basis_set)
 
 
 class Molecule:
@@ -30,7 +30,7 @@ class Molecule:
         self.logger = logger
         self.basis_set = basis_set
         self.atomlist = None
-        self.basisfunctions = None
+        self.bfuncs = None
         self.natom = 0
         self.nelectrons = 0
         self.n_velectrons = 0
@@ -62,7 +62,7 @@ class Molecule:
         self.natom = len(self.atomlist)
 
     def set_basis(self, name: str = bs.STO3G) -> None:
-        self.basisfunctions = []
+        self.bfuncs = []
         # Initialize BasisSet instance
         basis = bs.BasisSet(name=name)
         # Generate unique list of symbols
@@ -74,8 +74,8 @@ class Molecule:
             for bf in bfunctions:
                 newbf = copy.deepcopy(bf)
                 newbf.set_A(at.coord)
-                self.basisfunctions.append(newbf)
-        self.nbf = len(self.basisfunctions)
+                self.bfuncs.append(newbf)
+        self.nbf = len(self.bfuncs)
 
     def get_S(self) -> ndarray:
         return self.S
@@ -97,7 +97,7 @@ class Molecule:
                 if i == j:  # we use normalized gaussians
                     self.S[i, j] = 1
                     continue
-                self.S[i, j] = self.basisfunctions[i].S(self.basisfunctions[j])
+                self.S[i, j] = self.bfuncs[i].S(self.bfuncs[j])
                 self.S[j, i] = self.S[i, j]
         log()
         return self.S
@@ -107,7 +107,7 @@ class Molecule:
         self.TElec = np.zeros((self.nbf, self.nbf))
         for i in np.arange(0, self.nbf):
             for j in np.arange(i, self.nbf):
-                self.TElec[i, j] = self.basisfunctions[i].TElec(self.basisfunctions[j])
+                self.TElec[i, j] = self.bfuncs[i].TElec(self.bfuncs[j])
                 self.TElec[j, i] = self.TElec[i, j]
         log()
         return self.TElec
@@ -115,7 +115,7 @@ class Molecule:
     def get_Vij(self, i, j) -> float:
         result = 0.0
         for at in self.atomlist:
-            result -= at.atnum * self.basisfunctions[i].VNuc(self.basisfunctions[j], at.coord)
+            result -= at.atnum * self.bfuncs[i].VNuc(self.bfuncs[j], at.coord)
         return result
 
     def calc_VNuc(self) -> ndarray:
@@ -135,18 +135,70 @@ class Molecule:
             for j in np.arange(self.nbf):
                 for k in np.arange(self.nbf):
                     for l in np.arange(self.nbf):
-                        self.VElec[i, j, k, l] = self.basisfunctions[i].VElec(
-                            self.basisfunctions[j], self.basisfunctions[k], self.basisfunctions[l])
+                        self.VElec[i, j, k, l] = self.__velec(i, j, k, l)
         log()
         return self.VElec
 
-    def calc_VElec(self) -> ndarray:
-        log = self.logger.logAfter('Molecule.calc_VElec()')
+    def calc_VElec_Symm(self) -> ndarray:
+        log = self.logger.logAfter('Molecule.calc_VElec_Symm()')
         self.VElec = np.zeros((self.nbf, self.nbf, self.nbf, self.nbf))
         integral_mapping = self.get_velec_integral_map()
         for key in integral_mapping:
-            velec = self.basisfunctions[key[0]].VElec(self.basisfunctions[key[1]], self.basisfunctions[key[2]],
-                                                      self.basisfunctions[key[3]])
+            velec = self.__velec(key[0], key[1], key[2], key[3])
+            for value in integral_mapping[key]:
+                self.VElec[value[0], value[1], value[2], value[3]] = velec
+        log()
+        return self.VElec
+
+    def calc_VElec_Screening(self, treshold=1e-6) -> ndarray:
+        log = self.logger.logAfter('Molecule.calc_VElec_Screening()')
+        self.VElec = np.zeros((self.nbf, self.nbf, self.nbf, self.nbf))
+        zero_integrals = {(-1, -1)}
+
+        for i in np.arange(self.nbf):
+            for j in np.arange(self.nbf):
+                velec = self.__velec(i, j, i, j)
+                q_ij = np.sqrt(velec)
+                if q_ij < treshold:
+                    zero_integrals.add((i, j))
+                    continue
+                cases = self.__velec_integral_mapping(i, j, i, j)
+                for case in cases:
+                    self.VElec[case[0], case[1], case[2], case[3]] = velec
+
+        for i in np.arange(self.nbf):
+            for j in np.arange(self.nbf):
+                for k in np.arange(self.nbf):
+                    for l in np.arange(self.nbf):
+                        if (i, j) in zero_integrals or (k, l) in zero_integrals:
+                            continue
+                        self.VElec[i, j, k, l] = self.__velec(i, j, k, l)
+        log()
+        return self.VElec
+
+    def calc_VElec_Symm_Screening(self, treshold=1e-6) -> ndarray:
+        log = self.logger.logAfter('Molecule.calc_VElec_Symm_Screening()')
+        self.VElec = np.zeros((self.nbf, self.nbf, self.nbf, self.nbf))
+        zero_integrals = {(-1, -1)}
+        integral_mapping = self.get_velec_integral_map()
+
+        for i in np.arange(self.nbf):
+            for j in np.arange(self.nbf):
+                velec = self.__velec(i, j, i, j)
+                q_ij = np.sqrt(velec)
+                if q_ij < treshold:
+                    zero_integrals.add((i, j))
+                    continue
+                cases = self.__velec_integral_mapping(i, j, i, j)
+                for case in cases:
+                    self.VElec[case[0], case[1], case[2], case[3]] = velec
+                    if case in integral_mapping:
+                        integral_mapping.pop(case)
+
+        for key in integral_mapping:
+            if (key[0], key[1]) in zero_integrals or (key[2], key[3]) in zero_integrals:
+                continue
+            velec = self.__velec(key[0], key[1], key[2], key[3])
             for value in integral_mapping[key]:
                 self.VElec[value[0], value[1], value[2], value[3]] = velec
         log()
@@ -170,3 +222,6 @@ class Molecule:
     def __velec_integral_mapping(self, i, j, k, l) -> set:
         return {(i, j, k, l), (k, l, i, j), (j, i, l, k), (l, k, j, i), (j, i, k, l), (l, k, i, j), (i, j, l, k),
                 (k, l, j, i)}
+
+    def __velec(self, i, j, k, l):
+        return self.bfuncs[i].VElec(self.bfuncs[j], self.bfuncs[k], self.bfuncs[l])

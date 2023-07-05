@@ -1,19 +1,15 @@
 import numpy as np
 
-from chemical_system import atom as at, molecule as mol
+from chemical_system import atom as at, molecule
 from basis_sets import basis_set as bs
 from calculator import RHF
 from util import timelogger
-from calculator import EH
 from pyscf import gto, scf
+import matplotlib.pyplot as plt
 
 logger = timelogger.TimeLogger()
 
-
-# Coordinates are in the unit of Angstrom.
-"""o1 = at.Atom('O', [0.000, 0.000, 0.000], unit='A')
-h1 = at.Atom('H', [1.000, 0.000, 0.000], unit='A')
-h2 = at.Atom('H', [0.000, 1.000, 0.000], unit='A')"""
+print("Aufgabe 1 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n")
 o1 = at.Atom('O', [0.000, 0.000, 0.000], unit='A')
 h1 = at.Atom('H', [0.758, 0.587, 0.000], unit='A')
 h2 = at.Atom('H', [-0.758, 0.587, 0.000], unit='A')
@@ -25,70 +21,61 @@ mf = scf.RHF(m_pyscf)
 mf.kernel()
 dm = mf.make_rdm1()
 
+m = molecule.Molecule(logger, [o1, h1, h2], bs.STO3G)
 
-m = mol.Molecule(logger, [o1, h1, h2], bs.STO3G)
-
-VElec = m.calc_VElec()
-#m.calc_VElec_primitive()
 VElec_ps = m_pyscf.intor('int2e')
-print(np.allclose(VElec, VElec_ps), "\n")
+VElec_symm = m.calc_VElec_Symm()
+VElec_screened = m.calc_VElec_Screening()
+VElec_symm_screened = m.calc_VElec_Symm_Screening()
 
-#print(m.get_velec_integral_map())
+print("Equality of symmetric calculated VElec ----------------------------------------------------------------------\n")
+print(np.allclose(VElec_ps, VElec_symm))
+print("Equality of screened calculated VElec -----------------------------------------------------------------------\n")
+print(np.allclose(VElec_ps, VElec_screened))
+print("Equality of screened and symmetric calculated VElec ---------------------------------------------------------\n")
+print(np.allclose(VElec_ps, VElec_symm_screened))
 
-#rhf = RHF.RHFCalculator(m)
-#rhf.calculate()
-#electronic_energy = rhf.get_Electronic_Energy()
-#print(electronic_energy)
+print("Aufgabe 2 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n")
+o11 = at.Atom('O', [0.000, 0.000, 0.000], unit='A')
+h11 = at.Atom('H', [0.758 * 2, 0.587 * 2, 0.000], unit='A')
+h22 = at.Atom('H', [-0.758 * 2, 0.587 * 2, 0.000], unit='A')
+m_stretched = molecule.Molecule(logger, [o11, h11, h22], bs.STO3G)
+calc = RHF.RHFCalculator(m_stretched)
 
+# ----------------------------------------------------------------------------------------------------------------------
+calc.calculate(alpha=0)
+scf_energies = calc.get_SCF_Energies()
+steps = np.arange(0, scf_energies.size, 1, dtype=int)
 
-"""m = mol.Molecule([o1, h1, h2], bs.VSTO3G)
-eh = EH.EHCalculator(m)
-eh.calculate()
+fig, axs = plt.subplots(1, 1, tight_layout=True)
+fig.suptitle(r"SCF-Energies")
+axs.plot(steps, scf_energies)
+axs.set_xlabel(r"Step")
+axs.set_ylabel(r"Energy $a. u.$")
+plt.show()
 
+# ----------------------------------------------------------------------------------------------------------------------
+calc.calculate()
+scf_energies = calc.get_SCF_Energies()
+steps = np.arange(0, scf_energies.size, 1, dtype=int)
 
-H = eh.get_H()
-electronic_energy = eh.get_Electronic_Energy()
-erep = eh.get_Total_ERep_Klopman()
-nrep = eh.get_Total_NRep_Klopman()
-total_energy = eh.get_Total_Energy()
-print("H-Matrix-----------------------------------------------------------------------------------------------------\n")
-print(H, "\n")
-print("elecgtronic_energy-------------------------------------------------------------------------------------------\n")
-print(electronic_energy, "\n")
-print("ERep---------------------------------------------------------------------------------------------------------\n")
-print(erep, "\n")
-print("NRep---------------------------------------------------------------------------------------------------------\n")
-print(nrep, "\n")
-print("total_energy-------------------------------------------------------------------------------------------------\n")
-print(total_energy, "\n")
-"""
+fig2, axs2 = plt.subplots(1, 1, tight_layout=True)
+fig2.suptitle(r"SCF-Energies")
+axs2.plot(steps, scf_energies)
+axs2.set_xlabel(r"Step")
+axs2.set_ylabel(r"Energy $a. u.$")
+plt.show()
 
+# ----------------------------------------------------------------------------------------------------------------------
 
-"""
-m = mol.Molecule([o1, h1, h2], bs.STO3G)
-S = m.calc_S()
-T = m.calc_TElec()
-VNuc = m.calc_VNuc()
-VElec = m.calc_VElec()
-
-m_pyscf = gto.Mole()
-m_pyscf.basis = bs.STO3G
-m_pyscf.atom = [['O',(0.000, 0.000, 0.000)], ['H',(1.000, 0.000, 0.000)], ['H',(0.000, 1.000, 0.000)]]
-mf = scf.RHF(m_pyscf)
-mf.kernel()
-dm = mf.make_rdm1()
-
-S_ps = m_pyscf.intor('int1e_ovlp')
-VNuc_ps = m_pyscf.intor('int1e_nuc')
-T_ps = m_pyscf.intor('int1e_kin')
-VElec_ps = m_pyscf.intor('int2e')
-
-print("S-Matrix-----------------------------------------------------------------------------------------------------\n")
-print(np.allclose(S, S_ps), "\n")
-print("TElec--------------------------------------------------------------------------------------------------------\n")
-print(np.allclose(T, T_ps), "\n")
-print("VNuc---------------------------------------------------------------------------------------------------------\n")
-print(np.allclose(VNuc, VNuc), "\n")
-print("VElec--------------------------------------------------------------------------------------------------------\n")
-print(np.allclose(VElec, VElec_ps), "\n")
-"""
+alpha_list = np.arange(0.00, 1.00, 0.02, dtype=float)
+iterations = []
+for a in alpha_list:
+    calc.calculate(max_iter=200, alpha=a)
+    iterations.append(calc.get_SCF_Energies().size)
+fig3, axs3 = plt.subplots(1, 1, tight_layout=True)
+fig3.suptitle(r"SCF-Convergence")
+axs3.plot(alpha_list, iterations)
+axs3.set_xlabel(r"$\alpha$")
+axs3.set_ylabel(r"Iterations")
+plt.show()

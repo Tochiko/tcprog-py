@@ -59,15 +59,15 @@ class EHCalculator:
         for i in np.arange(0, self.m.nbf):
             for j in np.arange(i, self.m.nbf):
                 if i == j:
-                    gaussian = self.m.basisfunctions[i]
+                    gaussian = self.m.bfuncs[i]
                     l = np.array(gaussian.ijk).sum()
                     if l > 1: raise NotImplementedError(
                         'there are no eht parameters for higher orbitals such as p-orbs')
                     parameter = parm.AO_A_S if l == 0 else parm.AO_A_P
                     self.H[i, j] = parm.AO_PARAMS[parameter][gaussian.symbol] * factor
                 else:
-                    gaussian_i = self.m.basisfunctions[i]
-                    gaussian_j = self.m.basisfunctions[j]
+                    gaussian_i = self.m.bfuncs[i]
+                    gaussian_j = self.m.bfuncs[j]
                     l_i = np.array(gaussian_i.ijk).sum()
                     l_j = np.array(gaussian_j.ijk).sum()
                     if l_i > 1 or l_j > 1: raise NotImplementedError('there are no eht parameters for higher orbitals '
