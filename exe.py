@@ -27,10 +27,18 @@ dm = mf.make_rdm1()
 
 
 m = mol.Molecule(logger, [o1, h1, h2], bs.STO3G)
-rhf = RHF.RHFCalculator(m)
-rhf.calculate()
-electronic_energy = rhf.get_Electronic_Energy()
-print(electronic_energy)
+
+VElec = m.calc_VElec()
+#m.calc_VElec_primitive()
+VElec_ps = m_pyscf.intor('int2e')
+print(np.allclose(VElec, VElec_ps), "\n")
+
+#print(m.get_velec_integral_map())
+
+#rhf = RHF.RHFCalculator(m)
+#rhf.calculate()
+#electronic_energy = rhf.get_Electronic_Energy()
+#print(electronic_energy)
 
 
 """m = mol.Molecule([o1, h1, h2], bs.VSTO3G)

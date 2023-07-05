@@ -128,8 +128,8 @@ class Molecule:
         log()
         return self.VNuc
 
-    def calc_VElec(self) -> ndarray:
-        log = self.logger.logAfter('Molecule.calc_VElec()')
+    def calc_VElec_primitive(self) -> ndarray:
+        log = self.logger.logAfter('Molecule.calc_VElec_primitive()')
         self.VElec = np.zeros((self.nbf, self.nbf, self.nbf, self.nbf))
         for i in np.arange(self.nbf):
             for j in np.arange(self.nbf):
@@ -139,3 +139,34 @@ class Molecule:
                             self.basisfunctions[j], self.basisfunctions[k], self.basisfunctions[l])
         log()
         return self.VElec
+
+    def calc_VElec(self) -> ndarray:
+        log = self.logger.logAfter('Molecule.calc_VElec()')
+        self.VElec = np.zeros((self.nbf, self.nbf, self.nbf, self.nbf))
+        integral_mapping = self.get_velec_integral_map()
+        for key in integral_mapping:
+            velec = self.basisfunctions[key[0]].VElec(self.basisfunctions[key[1]], self.basisfunctions[key[2]],
+                                                      self.basisfunctions[key[3]])
+            for value in integral_mapping[key]:
+                self.VElec[value[0], value[1], value[2], value[3]] = velec
+        log()
+        return self.VElec
+
+    def get_velec_integral_map(self) -> dict:
+        result = {}
+        checked = np.zeros((self.nbf, self.nbf, self.nbf, self.nbf))
+        for i in np.arange(self.nbf):
+            for j in np.arange(self.nbf):
+                for k in np.arange(self.nbf):
+                    for l in np.arange(self.nbf):
+                        if checked[i, j, k, l] == 1:
+                            continue
+                        ident_integrals = self.__velec_integral_mapping(i, j, k, l)
+                        result[(i, j, k, l)] = ident_integrals
+                        for ident in ident_integrals:
+                            checked[ident[0], ident[1], ident[2], ident[3]] = 1
+        return result
+
+    def __velec_integral_mapping(self, i, j, k, l) -> set:
+        return {(i, j, k, l), (k, l, i, j), (j, i, l, k), (l, k, j, i), (j, i, k, l), (l, k, i, j), (i, j, l, k),
+                (k, l, j, i)}
