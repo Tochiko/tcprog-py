@@ -11,7 +11,7 @@ import scipy.constants as const
 a0 = const.physical_constants['Bohr radius'][0] * 1e10
 
 
-def from_xyz(filename: str, basis_set: str = bs.STO3G) -> 'Molecule':
+def from_xyz(filename: str, logger, basis_set: str = bs.STO3G) -> 'Molecule':
     atoms = []
     with open(filename) as f:
         for line in f:
@@ -22,7 +22,7 @@ def from_xyz(filename: str, basis_set: str = bs.STO3G) -> 'Molecule':
                 at = atom.Atom(symbol, coord)
                 atoms.append(at)
 
-    return Molecule(atoms, basis_set)
+    return Molecule(logger, atoms, basis_set)
 
 
 class Molecule:
