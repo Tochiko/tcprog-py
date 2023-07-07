@@ -7,11 +7,12 @@ from basis_sets import basis_set as bs
 from chemical_system import atom
 from chemical_system import atomic_data
 import scipy.constants as const
+from util.nonelogger import NoneLogger
 
 a0 = const.physical_constants['Bohr radius'][0] * 1e10
 
 
-def from_xyz(filename: str, logger, basis_set: str = bs.STO3G) -> 'Molecule':
+def from_xyz(filename: str, basis_set: str = bs.STO3G) -> 'Molecule':
     atoms = []
     with open(filename) as f:
         for line in f:
@@ -22,12 +23,15 @@ def from_xyz(filename: str, logger, basis_set: str = bs.STO3G) -> 'Molecule':
                 at = atom.Atom(symbol, coord)
                 atoms.append(at)
 
-    return Molecule(logger, atoms, basis_set)
+    return Molecule(atoms, basis_set)
 
 
 class Molecule:
-    def __init__(self, logger, atom_list: [atom.Atom] = None, basis_set: str = bs.STO3G) -> None:
-        self.logger = logger
+    def __init__(self, atom_list: [atom.Atom] = None, basis_set: str = bs.STO3G, logger = None) -> None:
+        if logger == None:
+            self.logger = NoneLogger()
+        else:
+            self.logger = logger
         self.basis_set = basis_set
         self.atomlist = None
         self.basisfunctions = None
@@ -44,6 +48,12 @@ class Molecule:
         self.TElec = None
         self.VNuc = None
         self.VElec = None
+
+    def set_logger(self, logger):
+        if logger == None:
+                self.logger = NoneLogger()
+        else:
+            self.logger = logger
 
     def set_atomlist(self, a: list) -> None:
         self.atomlist = []
