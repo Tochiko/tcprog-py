@@ -174,6 +174,9 @@ class Molecule:
         log()
         return self.VElec
     
+    def calc_VElec_Symm(self) -> ndarray:
+        return self.get_twoel_symm()
+    
     #must be named as such :(
     def get_twoel_screening(self, q_min = 0.001) -> ndarray:
         log = self.logger.logAfter('Molecule.get_twoel_screening()')
@@ -218,3 +221,6 @@ class Molecule:
                             self.VElec[l, k, i, j] = integral
         log()
         return self.VElec
+    
+    def calc_VElec_Symm_Screening(self, q_min = 1e-6) -> ndarray:
+        return self.get_twoel_screening(q_min)

@@ -1,4 +1,5 @@
 import numpy as np
+from numpy import ndarray
 
 
 class RHFCalculator():
@@ -10,18 +11,23 @@ class RHFCalculator():
 
         self.m = molecule
         self.hcore = None
-        self.p = None
+        self.P = None
         self.X = None
+        self.scf_energies = None
         self.ElectronicEnergy = 0.
 
-    def __initialize(self):
+    def __initialize(self, treshold_screening=1e-6):
         self.nocc = self.m.nelectrons // 2
 
         # precalculate integrals
-        self.m.calc_S()
-        self.m.calc_TElec()
-        self.m.calc_VNuc()
-        self.m.calc_VElec()
+        if self.m.S is None:
+            self.m.calc_S()
+        if self.m.TElec is None:
+            self.m.calc_TElec()
+        if self.m.VNuc is None:
+            self.m.calc_VNuc()
+        if self.m.VElec is None:
+            self.m.calc_VElec_Symm_Screening(q_min = treshold_screening)
 
         # orthogonalize AO
         eigval, eigvec = np.linalg.eigh(self.m.S)
@@ -32,7 +38,7 @@ class RHFCalculator():
         orb_en, orb = np.linalg.eigh(self.hcore)
 
         c = orb[:, :self.nocc]
-        self.p = c @ c.T
+        self.P = c @ c.T
 
     def __get_fock(self, p):
         g = np.einsum(
@@ -41,25 +47,29 @@ class RHFCalculator():
         )
         return self.hcore + g
 
-    def calculate(self, max_iter=100, threshold=1e-6):
-        self.__initialize()
+    def calculate(self, max_iter=100, threshold=1e-6, alpha=0.5, treshold_screening=1e-6):
+        self.__initialize(treshold_screening=treshold_screening)
         energy_last_iteration = 0.0
-        p_old = np.copy(self.p)
+        P_old = np.copy(self.P)
+        self.scf_energies = []
         for iteration in range(max_iter):
             # calculate Fock-matrix
-            f = self.__get_fock(self.p)
+            f = self.__get_fock(self.P)
             # orthogonalize Fock-Matrix
             f_ortho = self.X.T @ f @ self.X
             # diagonalize Fock-Matrix
             eigvals, eigvect = np.linalg.eigh(f_ortho)
             # get new density matrix
             c = eigvect[:, :self.nocc]
-            self.p = c @ c.T
-            self.p = self.X @ self.p @ self.X.T
+            self.P = c @ c.T
+            self.P = self.X @ self.P @ self.X.T
+            self.P = alpha*P_old + (1-alpha)*self.P
+            P_old = self.P
             # calculate energy
-            energy = np.trace((self.hcore + f) @ self.p)
-            #print(f"Iteration {iteration}, Energy = {energy} Hartree")
-            #print(f"MO energies: {eigvals}")
+            energy = np.trace((self.hcore + f) @ self.P)
+            self.scf_energies.append(energy)
+            # print(f"Iteration {iteration}, Energy = {energy} Hartree")
+            # print(f"MO energies: {eigvals}")
             if np.abs(energy - energy_last_iteration) < threshold:
                 break
             energy_last_iteration = energy
@@ -67,3 +77,6 @@ class RHFCalculator():
 
     def get_Electronic_Energy(self) -> float:
         return self.ElectronicEnergy
+
+    def get_SCF_Energies(self) -> ndarray:
+        return np.array(self.scf_energies)
